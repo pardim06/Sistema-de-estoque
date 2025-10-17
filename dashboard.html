@@ -36,7 +36,7 @@
         <div class="flex items-center justify-between mb-8">
             <div class="text-2xl font-bold flex items-center">
                 <i class="fas fa-boxes-stacked mr-2 text-indigo-300"></i>
-                Estoque ERP
+                Estoque 
             </div>
             <!-- Botão de fechar para mobile -->
             <button id="close-sidebar" class="md:hidden text-indigo-300 hover:text-white focus:outline-none">
@@ -58,15 +58,16 @@
             </a>
             <a href="#" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
                 <i class="fas fa-users mr-3"></i>
-                Clientes (Em desemvolvimento)
+                Clientes
+                 (Em desenvolvimento)
             </a>
             <a href="#" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
                 <i class="fas fa-pallet mr-3"></i>
-                Produtos (Em desemvolvimento)
+                Produtos (Em desenvolvimento)
             </a>
             <a href="#" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
                 <i class="fas fa-truck mr-3"></i>
-                Entregas (Em desemvolvimento)
+                Entregas (Em desenvolvimento)
             </a>
         </nav>
 
@@ -89,8 +90,10 @@
             </button>
             <h1 class="text-xl font-semibold text-gray-800 ml-4 md:ml-0">Painel de Estoque</h1>
             <div class="flex items-center space-x-4">
-                <p class="text-sm text-gray-600 hidden sm:block">Olá, <span class="font-medium">teste@t</span></p>
-                <div class="h-10 w-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold">L</div>
+                <!-- AQUI É ONDE VOCÊ ALTERA O NOME DO USUÁRIO -->
+                <!-- O valor 'Usuário Local' foi alterado para 'Usuário Exemplo' para fins de demonstração -->
+                <p class="text-sm text-gray-600 hidden sm:block">Olá, <span class="font-medium" id="user-name-display">test@t</span></p>
+                <div class="h-10 w-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold">T</div>
             </div>
         </header>
 
@@ -328,36 +331,48 @@
             const year = now.getFullYear();
             return `${day}/${month}/${year}`;
         }
+        
+        /**
+         * Converte uma string de data (ex: '2025-10-24') para o formato DD/MM/AAAA.
+         * Se já estiver no formato BR, retorna como está.
+         * @param {string} dateString - String de data.
+         * @returns {string} - Data formatada em DD/MM/AAAA.
+         */
+        function formatDateToBR(dateString) {
+            if (!dateString) return '';
+            
+            // 1. Verifica se já está no formato DD/MM/AAAA
+            if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                return dateString;
+            }
+            
+            // 2. Tenta converter de AAAA-MM-DD (Formato ISO comum em inputs e bancos de dados)
+            const parts = dateString.split('-');
+            if (parts.length === 3 && parts[0].length === 4) {
+                // parts[0]=AAAA, parts[1]=MM, parts[2]=DD
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            
+            // 3. Se tudo falhar, retorna a string original
+            return dateString;
+        }
 
 
         /**
-         * Carrega os itens do LocalStorage ou inicializa com dados de demonstração.
+         * Carrega os itens do LocalStorage. Não carrega mais dados de demonstração.
          * @returns {Array} - Lista de itens.
          */
         function loadItems() {
             try {
                 const storedItems = localStorage.getItem('stock_items');
+                // Se houver itens armazenados, carrega. Senão, inicia como array vazio.
                 stockItems = storedItems ? JSON.parse(storedItems) : [];
                 
-                // Garante que a data de entrada exista para todos os itens (compatibilidade com dados antigos)
+                // Garante que a data de entrada exista para todos os itens (compatibilidade)
                 stockItems = stockItems.map(item => ({
                     ...item,
                     entryDate: item.entryDate || getCurrentDateFormatted() // Define data atual se estiver faltando
                 }));
-
-
-                // --- ADICIONA DADOS DE DEMONSTRAÇÃO SE ESTIVER VAZIO ---
-                if (stockItems.length === 0) {
-                    stockItems = [
-                        { id: 1, name: "Parafuso M8", type: "materia-prima", quantity: 1500, minQuantity: 200, supplier: "Metalúrgica Alfa", entryDate: "15/10/2024" },
-                        { id: 2, name: "Painel Solar 300W", type: "produto-acabado", quantity: 12, minQuantity: 50, supplier: "SolarTech Brasil", entryDate: "20/09/2024" },
-                        { id: 3, name: "Fio de Cobre (Rolo 100m)", type: "materia-prima", quantity: 80, minQuantity: 75, supplier: "Eletro Cabos", entryDate: getCurrentDateFormatted() },
-                        { id: 4, name: "Bateria de Lítio 12V", type: "produto-acabado", quantity: 500, minQuantity: 100, supplier: "Power Cell", entryDate: "01/10/2024" }
-                    ];
-                    // Salva os dados de demonstração para que apareçam na próxima vez
-                    saveItems(); 
-                }
-                // --------------------------------------------------------
                 
                 return stockItems;
             } catch (e) {
@@ -422,6 +437,8 @@
                 // Criação da linha da tabela
                 const statusColor = isLowStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
                 const statusText = isLowStock ? 'Baixo Estoque' : 'Em Estoque';
+                const formattedDate = formatDateToBR(item.entryDate); // <-- AQUI USAMOS A NOVA FUNÇÃO
+
                 const row = `
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
@@ -432,7 +449,7 @@
                                 ${statusText}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.entryDate}</td> <!-- Linha onde a Data de Entrada é mostrada -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedDate}</td> <!-- AGORA COM O FORMATO BR -->
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.supplier}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button data-item-id="${item.id}" class="edit-btn text-indigo-600 hover:text-indigo-900 focus:outline-none p-1">
@@ -485,7 +502,7 @@
             editIdInput.value = item.id;
             editNameInput.value = item.name;
             editQuantityInput.value = item.quantity;
-            editEntryDateInput.value = item.entryDate; // POPULA O CAMPO DATA DE ENTRADA NO MODAL
+            editEntryDateInput.value = formatDateToBR(item.entryDate); // <-- AQUI USAMOS A NOVA FUNÇÃO
             
             editModal.classList.remove('hidden');
         }
@@ -562,7 +579,7 @@
         // --- Renderização Principal ---
 
         function renderAllItems() {
-            loadItems(); // Carrega os dados mais recentes do LocalStorage, incluindo a inicialização de demo
+            loadItems(); // Carrega os dados mais recentes do LocalStorage (agora sem demo)
             updateSummaryAndTable(stockItems); // Renderiza a tabela e os cards com todos os itens
         }
 
