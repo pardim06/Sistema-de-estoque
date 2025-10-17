@@ -1,0 +1,53 @@
+/* Estilos para garantir que o layout ocupe toda a altura */
+html, body {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Adiciona um efeito de transição suave aos inputs */
+input, select, textarea, button {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Remove as setas de inputs do tipo number */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-ok {
+    color: #166534; /* green-800 */
+    background-color: #dcfce7; /* green-100 */
+}
+
+.status-low {
+    color: #991b1b; /* red-800 */
+    background-color: #fee2e2; /* red-100 */
+}
+
+.status-out {
+    color: #4b5563; /* gray-600 */
+    background-color: #e5e7eb; /* gray-200 */
+}
