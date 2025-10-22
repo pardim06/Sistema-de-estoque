@@ -7,7 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
+   
+   <style>
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -20,51 +21,61 @@
             min-height: 100vh;
         }
         /* Estilo para garantir que o modal fique acima de tudo */
-        #item-modal, #confirm-modal {
+        #item-modal, #confirm-modal, #details-modal { /* Adicionado #details-modal */
             z-index: 50; 
         }
         /* Estilo para ajustar o scroll suave ao navegar por âncoras */
         html {
             scroll-behavior: smooth;
         }
+        
+        /* Estilo para a tabela de detalhes no novo modal */
+        #details-entries-table th, #details-entries-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+        #details-entries-table th {
+            background-color: #f9fafb; /* gray-50 */
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #4b5563; /* gray-600 */
+        }
     </style>
 </head>
 <body class="flex">
 
-    <!-- Sidebar (Menu Lateral) -->
     <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 bg-indigo-800 text-white w-64 p-4 z-30">
         <div class="flex items-center justify-between mb-8">
             <div class="text-2xl font-bold flex items-center">
                 <i class="fas fa-boxes-stacked mr-2 text-indigo-300"></i>
                 Estoque 
             </div>
-            <!-- Botão de fechar para mobile -->
             <button id="close-sidebar" class="md:hidden text-indigo-300 hover:text-white focus:outline-none">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
 
-        <!-- Links de Navegação -->
         <nav class="space-y-2">
-            <!-- Link para a seção Dashboard/Visão Geral -->
             <a href="#visao-geral" class="flex items-center p-3 rounded-lg bg-indigo-900 text-indigo-100 font-medium">
                 <i class="fas fa-chart-line mr-3"></i>
                 Dashboard
             </a>
-            <!-- LINK: CADASTRO DE ITEM (Aponta para o arquivo de cadastro) -->
             <a href="cadastro.html" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
                 <i class="fas fa-plus-circle mr-3"></i>
                 Cadastro de Item
+                 </a>
+            <a href="Producao.html" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
+                <i class="fas fa-pallet mr-3"></i>
+                Produção 
+            </a>
             </a>
             <a href="#" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
                 <i class="fas fa-users mr-3"></i>
                 Clientes
                  (Em desenvolvimento)
-            </a>
-            <a href="#" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
-                <i class="fas fa-pallet mr-3"></i>
-                Produtos (Em desenvolvimento)
-            </a>
+           
             <a href="#" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
                 <i class="fas fa-truck mr-3"></i>
                 Entregas (Em desenvolvimento)
@@ -79,28 +90,21 @@
         </div>
     </aside>
 
-    <!-- Conteúdo Principal Wrapper -->
     <div id="main-wrapper" class="flex-1 transition-all duration-300 main-wrapper">
         
-        <!-- Header/Top Bar (Substitui o header-container vazio) -->
         <header id="header-container" class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-20">
-            <!-- Botão de abrir menu para mobile -->
             <button id="open-sidebar" class="md:hidden text-indigo-600 focus:outline-none">
                 <i class="fas fa-bars text-xl"></i>
             </button>
             <h1 class="text-xl font-semibold text-gray-800 ml-4 md:ml-0">Painel de Estoque</h1>
             <div class="flex items-center space-x-4">
-                <!-- AQUI É ONDE VOCÊ ALTERA O NOME DO USUÁRIO -->
-                <!-- O valor 'Usuário Local' foi alterado para 'Usuário Exemplo' para fins de demonstração -->
                 <p class="text-sm text-gray-600 hidden sm:block">Olá, <span class="font-medium" id="user-name-display">test@t</span></p>
                 <div class="h-10 w-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold">T</div>
             </div>
         </header>
 
-        <!-- Main Content Area (Seu conteúdo original) -->
         <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
-            <!-- Área de Mensagem de Status (Nova) -->
             <div id="status-message-container" class="mb-4 hidden" role="alert">
                 <div id="status-message" class="p-4 rounded-lg shadow-md flex items-center justify-between">
                     <p class="text-sm font-medium"></p>
@@ -110,13 +114,11 @@
                 </div>
             </div>
 
-            <!-- Seção de Visão Geral (Dashboard) - Adicionado ID para navegação -->
             <section id="visao-geral">
                 <h1 class="text-3xl font-bold text-gray-800 mb-6 hidden md:block">Visão Geral do Estoque</h1>
 
-                <!-- Cards de Resumo -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                    <div id="card-total" class="bg-white p-6 rounded-2xl shadow-lg flex items-center justify-between cursor-pointer hover:shadow-xl transition-shadow">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Total de Itens</p>
                             <p id="total-items" class="text-2xl font-bold text-gray-800">0</p>
@@ -125,7 +127,7 @@
                             <i class="fas fa-boxes-stacked fa-lg text-indigo-600"></i>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                    <div id="card-raw" class="bg-white p-6 rounded-2xl shadow-lg flex items-center justify-between cursor-pointer hover:shadow-xl transition-shadow">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Matérias-Primas</p>
                             <p id="total-raw-materials" class="text-2xl font-bold text-gray-800">0</p>
@@ -134,7 +136,7 @@
                             <i class="fas fa-cogs fa-lg text-blue-600"></i>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                    <div id="card-finished" class="bg-white p-6 rounded-2xl shadow-lg flex items-center justify-between cursor-pointer hover:shadow-xl transition-shadow">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Produtos Acabados</p>
                             <p id="total-finished-products" class="text-2xl font-bold text-gray-800">0</p>
@@ -143,7 +145,7 @@
                             <i class="fas fa-box-open fa-lg text-green-600"></i>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                    <div id="card-low-stock" class="bg-white p-6 rounded-2xl shadow-lg flex items-center justify-between cursor-pointer hover:shadow-xl transition-shadow">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Itens em Baixo Estoque</p>
                             <p id="low-stock-items" class="text-2xl font-bold text-red-500">0</p>
@@ -154,7 +156,6 @@
                     </div>
                 </div>
 
-                <!-- Tabela de Estoque -->
                 <div class="bg-white p-8 rounded-2xl shadow-lg mb-12">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
                         <h2 class="text-xl font-semibold text-gray-800">Itens em Estoque </h2>
@@ -170,16 +171,14 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Entrada</th> <!-- NOVO CAMPO -->
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fornecedor</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Entrada</th> <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fornecedor</th>
                                     <th scope="col" class="relative px-6 py-3">
                                         <span class="sr-only">Ações</span>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody id="stock-table-body" class="bg-white divide-y divide-gray-200">
-                                <!-- Linhas da tabela serão inseridas aqui via JS -->
-                            </tbody>
+                                </tbody>
                         </table>
                         <p id="no-items-message" class="text-center text-gray-500 py-8 hidden">Nenhum item encontrado no estoque local.</p>
                     </div>
@@ -188,7 +187,6 @@
         </main>
     </div>
 
-    <!-- Modal para editar/excluir item (Edit Modal) -->
     <div id="item-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
@@ -207,12 +205,10 @@
                         <label for="edit-item-name" class="block text-sm font-medium text-gray-700">Nome do Item</label>
                         <input type="text" id="edit-item-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                     </div>
-                    <!-- CAMPO DATA DE ENTRADA (somente leitura) -->
                     <div>
                         <label for="edit-item-entrydate" class="block text-sm font-medium text-gray-700">Data de Entrada</label>
                         <input type="text" id="edit-item-entrydate" readonly class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed">
                     </div>
-                    <!-- FIM CAMPO DATA DE ENTRADA -->
                     <div>
                         <label for="edit-item-quantity" class="block text-sm font-medium text-gray-700">Quantidade</label>
                         <input type="number" id="edit-item-quantity" min="0" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
@@ -225,7 +221,6 @@
             <button type="button" id="save-edit-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
               Salvar
             </button>
-            <!-- Este botão agora abrirá o modal de confirmação -->
             <button type="button" id="open-delete-confirm-button" class="mt-3 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
               Excluir
             </button>
@@ -237,7 +232,6 @@
       </div>
     </div>
     
-    <!-- Modal de Confirmação de Exclusão (Novo) -->
     <div id="confirm-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
@@ -268,7 +262,53 @@
       </div>
     </div>
 
+    <div id="details-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="details-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div id="details-modal-overlay" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+          <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+          <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full"> <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div class="sm:flex sm:items-start">
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <i class="fas fa-clipboard-list text-blue-600"></i>
+                </div>
+                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                  <h3 class="text-lg leading-6 font-medium text-gray-900" id="details-modal-title">
+                    Detalhes do Item: <span id="details-item-name" class="font-bold"></span>
+                  </h3>
+                  <div class="mt-4">
+                    <p class="text-sm text-gray-600 mb-4">
+                      Quantidade Total em Estoque: 
+                      <span id="details-total-quantity" class="font-bold text-lg text-gray-800">0</span>
+                    </p>
+                    
+                    <h4 class="text-md font-semibold text-gray-700 mb-2">Histórico de Entradas</h4>
+                    <div class="max-h-64 overflow-y-auto border rounded-lg">
+                      <table id="details-entries-table" class="min-w-full">
+                        <thead>
+                          <tr>
+                            <th>Data de Entrada</th>
+                            <th>Quantidade</th>
+                            <th>Fornecedor</th>
+                            <th>Data de Registro (Sistema)</th>
+                          </tr>
+                        </thead>
+                        <tbody id="details-entries-table-body" class="divide-y divide-gray-200">
+                          </tbody>
+                      </table>
+                    </div>
 
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <button type="button" id="close-details-modal-button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     <script>
         // Variável global para armazenar todos os itens (cache local)
         let stockItems = [];
@@ -278,170 +318,249 @@
 
 
         // --- Funções de Mensagem de Status ---
-
-        /**
-         * Exibe uma mensagem de status temporária na parte superior do dashboard.
-         * @param {string} message - A mensagem a ser exibida.
-         * @param {string} type - O tipo de mensagem ('success', 'error', 'info').
-         */
         function showMessage(message, type = 'info') {
             const container = document.getElementById('status-message-container');
             const msgElement = document.getElementById('status-message');
             const textElement = msgElement.querySelector('p');
             
-            // Limpa classes anteriores
             msgElement.className = 'p-4 rounded-lg shadow-md flex items-center justify-between';
 
             let bgColor, textColor;
             switch (type) {
-                case 'success':
-                    bgColor = 'bg-green-500';
-                    textColor = 'text-white';
-                    break;
-                case 'error':
-                    bgColor = 'bg-red-600';
-                    textColor = 'text-white';
-                    break;
-                case 'info':
-                default:
-                    bgColor = 'bg-blue-500';
-                    textColor = 'text-white';
-                    break;
+                case 'success': bgColor = 'bg-green-500'; textColor = 'text-white'; break;
+                case 'error': bgColor = 'bg-red-600'; textColor = 'text-white'; break;
+                default: bgColor = 'bg-blue-500'; textColor = 'text-white'; break;
             }
 
             msgElement.classList.add(bgColor, textColor);
             textElement.textContent = message;
             container.classList.remove('hidden');
 
-            // Esconde a mensagem após 5 segundos
-            setTimeout(() => {
-                container.classList.add('hidden');
-            }, 5000);
+            // Esconde a mensagem após 5 segundos, mas só se o container ainda existir
+             setTimeout(() => {
+                 const currentContainer = document.getElementById('status-message-container');
+                 if (currentContainer) {
+                     currentContainer.classList.add('hidden');
+                 }
+             }, 5000);
         }
 
         // --- Funções Auxiliares de Dados (Local Storage) ---
         
-        /**
-         * Retorna a data atual formatada (DD/MM/AAAA)
-         */
         function getCurrentDateFormatted() {
             const now = new Date();
             const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0'); // Mês começa do 0
+            const month = String(now.getMonth() + 1).padStart(2, '0');
             const year = now.getFullYear();
             return `${day}/${month}/${year}`;
         }
         
-        /**
-         * Converte uma string de data (ex: '2025-10-24') para o formato DD/MM/AAAA.
-         * Se já estiver no formato BR, retorna como está.
-         * @param {string} dateString - String de data.
-         * @returns {string} - Data formatada em DD/MM/AAAA.
-         */
         function formatDateToBR(dateString) {
             if (!dateString) return '';
+            if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) return dateString;
             
-            // 1. Verifica se já está no formato DD/MM/AAAA
-            if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                return dateString;
-            }
-            
-            // 2. Tenta converter de AAAA-MM-DD (Formato ISO comum em inputs e bancos de dados)
             const parts = dateString.split('-');
             if (parts.length === 3 && parts[0].length === 4) {
-                // parts[0]=AAAA, parts[1]=MM, parts[2]=DD
                 return `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
-            
-            // 3. Se tudo falhar, retorna a string original
             return dateString;
         }
 
-
-        /**
-         * Carrega os itens do LocalStorage. Não carrega mais dados de demonstração.
-         * @returns {Array} - Lista de itens.
-         */
-        function loadItems() {
+        function formatTimestampToBR(isoString) {
+            if (!isoString) return 'N/A';
             try {
-                const storedItems = localStorage.getItem('stock_items');
-                // Se houver itens armazenados, carrega. Senão, inicia como array vazio.
-                stockItems = storedItems ? JSON.parse(storedItems) : [];
-                
-                // Garante que a data de entrada exista para todos os itens (compatibilidade)
-                stockItems = stockItems.map(item => ({
-                    ...item,
-                    entryDate: item.entryDate || getCurrentDateFormatted() // Define data atual se estiver faltando
-                }));
-                
-                return stockItems;
+                const date = new Date(isoString);
+                 if (isNaN(date)) return 'Data Inválida'; // Verifica se a data é válida
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${day}/${month}/${year} ${hours}:${minutes}`;
             } catch (e) {
-                console.error("Erro ao carregar dados do LocalStorage:", e);
-                showMessage("Erro ao carregar dados do estoque. Verifique o console.", 'error');
-                return [];
+                console.error("Erro ao formatar timestamp:", isoString, e); // Loga o erro
+                return 'Erro Data'; // Retorna um placeholder em caso de erro
             }
         }
 
-        /**
-         * Salva a lista atual de itens no LocalStorage.
-         */
+        // --- CORREÇÃO: Adicionado try...catch robusto em loadItems ---
+        function loadItems() {
+            stockItems = []; // Reseta antes de carregar
+            const storedItems = localStorage.getItem('stock_items');
+            if (storedItems) {
+                try {
+                    const parsedItems = JSON.parse(storedItems);
+                    // Garante que é um array antes de processar
+                    if (Array.isArray(parsedItems)) {
+                        stockItems = parsedItems.map(item => ({
+                            ...item,
+                            // Garante valores padrão e tipos corretos
+                            id: item.id || Date.now() + Math.random(), // Garante um ID
+                            name: item.name || 'Nome Inválido', // Evita erros se o nome faltar
+                            entryDate: item.entryDate || getCurrentDateFormatted(),
+                            createdAt: item.createdAt || new Date().toISOString(),
+                            quantity: parseInt(item.quantity, 10) || 0, 
+                            minQuantity: parseInt(item.minQuantity, 10) || 0,
+                            type: item.type || 'desconhecido' // Tipo padrão
+                        }));
+                    } else {
+                        console.error("Dados do localStorage ('stock_items') não são um array:", parsedItems);
+                        showMessage("Erro: Formato inválido dos dados salvos.", 'error');
+                        localStorage.removeItem('stock_items'); // Remove dados inválidos
+                    }
+                } catch (e) {
+                    console.error("Erro CRÍTICO ao parsear 'stock_items' do LocalStorage:", e);
+                    showMessage("Erro grave ao carregar dados. Removendo dados corrompidos.", 'error');
+                    localStorage.removeItem('stock_items'); // Remove dados corrompidos para evitar loop de erro
+                    stockItems = []; // Garante que fique vazio
+                }
+            }
+            // Se não havia nada ou deu erro, stockItems será []
+        }
+
         function saveItems() {
-            localStorage.setItem('stock_items', JSON.stringify(stockItems));
+             try {
+                 localStorage.setItem('stock_items', JSON.stringify(stockItems));
+             } catch (e) {
+                 console.error("Erro ao salvar itens no LocalStorage:", e);
+                 showMessage("Não foi possível salvar os dados no navegador.", 'error');
+             }
         }
 
-        /**
-         * Atualiza os cards de resumo e a exibição da tabela.
-         * @param {Array} items - A lista de itens a ser processada.
-         */
-        function updateSummaryAndTable(items) {
-            const tableBody = document.getElementById('stock-table-body');
-            const noItemsMessage = document.getElementById('no-items-message');
-            tableBody.innerHTML = '';
-            
-            if (items.length === 0) {
-                noItemsMessage.classList.remove('hidden');
-            } else {
-                noItemsMessage.classList.add('hidden');
+        // --- Lógica de Agregação e Renderização ---
+
+       function getAggregatedStock() {
+            const grouped = new Map();
+             if (!Array.isArray(stockItems)) { 
+                 console.error("stockItems não é um array em getAggregatedStock");
+                 return [];
+             }
+
+            // 1. Agrupa e soma, mantendo o último fornecedor e o último NÃO-PRODUÇÃO
+            for (const item of stockItems) {
+                 if (!item.name || item.name === 'Nome Inválido') continue; 
+
+                if (!grouped.has(item.name)) {
+                    // Inicializa com dados do primeiro item
+                    grouped.set(item.name, { 
+                        name: item.name,
+                        quantity: 0,
+                        type: item.type,
+                        minQuantity: item.minQuantity,
+                        entryDate: item.entryDate,
+                        supplier: item.supplier, // Guarda o primeiro como fallback
+                        latestCreatedAt: item.createdAt,
+                        lastNonProdSupplier: null // Novo campo para rastrear
+                    });
+                     // Se o primeiro já não for da produção, marca ele
+                     if (item.supplier && !item.supplier.startsWith('Produção OP')) {
+                         grouped.get(item.name).lastNonProdSupplier = item.supplier;
+                     }
+                }
+
+                const data = grouped.get(item.name);
+                data.quantity += item.quantity; 
+                
+                // Atualiza com dados do item mais recente, se houver
+                 if (item.createdAt && (!data.latestCreatedAt || item.createdAt > data.latestCreatedAt)) {
+                    data.latestCreatedAt = item.createdAt;
+                    data.entryDate = item.entryDate;
+                    // NÃO atualiza o supplier principal aqui diretamente
+                    data.minQuantity = item.minQuantity; 
+                    data.type = item.type;
+                }
+
+                 // NOVO: Rastreia o ÚLTIMO fornecedor geral E o último NÃO-PRODUÇÃO
+                 data.supplier = item.supplier; // Guarda sempre o último encontrado
+                 if (item.supplier && !item.supplier.startsWith('Produção OP')) {
+                     data.lastNonProdSupplier = item.supplier; // Atualiza se não for de produção
+                 }
             }
 
+             // 2. Ajusta o fornecedor final a ser exibido
+             const aggregatedList = Array.from(grouped.values());
+             aggregatedList.forEach(itemData => {
+                 // Prioriza o último não-produção. Se não houver, usa o último geral.
+                 itemData.supplier = itemData.lastNonProdSupplier || itemData.supplier;
+             });
+
+            return aggregatedList;
+        }
+
+        function updateSummaryCards() {
             let totalItems = 0;
             let rawMaterials = 0;
             let finishedProducts = 0;
             let lowStockCount = 0;
-            let nextId = 1;
+            
+            const aggregatedStock = getAggregatedStock(); 
+            
+            aggregatedStock.forEach(item => {
+                 // Só conta no total se a quantidade não for zero
+                 if (item.quantity !== 0) {
+                     totalItems += item.quantity;
 
-            // Define o próximo ID (apenas para manter a consistência se o usuário cadastrar)
-            if (stockItems.length > 0) {
-                 // Certifica-se de que item.id é um número
-                const maxId = Math.max(...stockItems.map(item => item.id).filter(id => typeof id === 'number'));
-                nextId = maxId + 1;
+                     if (item.quantity <= item.minQuantity) {
+                        lowStockCount++;
+                     }
+                     if (item.type === 'materia-prima') {
+                        rawMaterials += item.quantity;
+                     } else if (item.type === 'produto-acabado') {
+                        finishedProducts += item.quantity;
+                     }
+                 }
+            });
+            
+            // Atualiza os elementos HTML, tratando o caso de não existirem
+             const elTotal = document.getElementById('total-items');
+             const elRaw = document.getElementById('total-raw-materials');
+             const elFinished = document.getElementById('total-finished-products');
+             const elLow = document.getElementById('low-stock-items');
+
+             if (elTotal) elTotal.textContent = totalItems.toLocaleString('pt-BR');
+             if (elRaw) elRaw.textContent = rawMaterials.toLocaleString('pt-BR');
+             if (elFinished) elFinished.textContent = finishedProducts.toLocaleString('pt-BR');
+             if (elLow) elLow.textContent = lowStockCount.toLocaleString('pt-BR');
+        }
+
+        function updateStockTable(aggregatedItems) {
+            const tableBody = document.getElementById('stock-table-body');
+            const noItemsMessage = document.getElementById('no-items-message');
+             
+             // Verifica se os elementos existem antes de usá-los
+             if (!tableBody || !noItemsMessage) {
+                 console.error("Elemento da tabela ou mensagem não encontrado!");
+                 return;
+             }
+             
+            tableBody.innerHTML = '';
+
+            // Filtra itens com quantidade zero ANTES de verificar o tamanho
+            const itemsToShow = aggregatedItems.filter(item => item.quantity !== 0);
+
+            if (itemsToShow.length === 0) {
+                noItemsMessage.classList.remove('hidden');
+            } else {
+                noItemsMessage.classList.add('hidden');
             }
-            localStorage.setItem('next_item_id', nextId);
+            
+            itemsToShow.sort((a, b) => (a.name || '').localeCompare(b.name || '')); // Ordena com segurança
 
-            // Percorre os itens filtrados ou todos os itens
-            items.forEach(item => {
-                totalItems += item.quantity;
-                
-                if (item.type === 'materia-prima') {
-                    rawMaterials += item.quantity;
-                } else if (item.type === 'produto-acabado') {
-                    finishedProducts += item.quantity;
-                }
-
-                // Verifica se o item está em baixo estoque
+            itemsToShow.forEach(item => {
                 const isLowStock = item.quantity <= item.minQuantity;
-                if (isLowStock) {
-                    lowStockCount++;
-                }
-
-                // Criação da linha da tabela
                 const statusColor = isLowStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
                 const statusText = isLowStock ? 'Baixo Estoque' : 'Em Estoque';
-                const formattedDate = formatDateToBR(item.entryDate); // <-- AQUI USAMOS A NOVA FUNÇÃO
+                const formattedDate = formatDateToBR(item.entryDate); 
 
                 const row = `
                     <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <a href="#" 
+                               class="details-btn text-indigo-600 hover:text-indigo-900 hover:underline" 
+                               data-item-name="${item.name}">
+                               ${item.name}
+                            </a>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.type === 'materia-prima' ? 'Matéria-Prima' : 'Produto Acabado'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-semibold">${item.quantity}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -449,41 +568,32 @@
                                 ${statusText}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedDate}</td> <!-- AGORA COM O FORMATO BR -->
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.supplier}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedDate}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.supplier || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button data-item-id="${item.id}" class="edit-btn text-indigo-600 hover:text-indigo-900 focus:outline-none p-1">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </td>
+                            </td>
                     </tr>
                 `;
                 tableBody.insertAdjacentHTML('beforeend', row);
             });
 
-            // Atualiza os Cards de Resumo (Totais)
-            document.getElementById('total-items').textContent = totalItems.toLocaleString('pt-BR');
-            document.getElementById('total-raw-materials').textContent = rawMaterials.toLocaleString('pt-BR');
-            document.getElementById('total-finished-products').textContent = finishedProducts.toLocaleString('pt-BR');
-            document.getElementById('low-stock-items').textContent = lowStockCount.toLocaleString('pt-BR');
-
-            // Adiciona listeners para os botões de edição após a renderização
-            document.querySelectorAll('.edit-btn').forEach(button => {
+            // Reatribui listeners após redesenhar a tabela
+            document.querySelectorAll('.details-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const itemId = parseInt(e.currentTarget.dataset.itemId, 10);
-                    openEditModal(itemId);
+                    e.preventDefault();
+                    const itemName = e.currentTarget.dataset.itemName;
+                    openDetailsModal(itemName);
                 });
             });
         }
         
-        // --- Lógica do Modal de Edição ---
-
+        // --- Lógica do Modal de Edição (Permanece igual) ---
         const editModal = document.getElementById('item-modal');
         const confirmModal = document.getElementById('confirm-modal');
         const editIdInput = document.getElementById('edit-item-id');
         const editNameInput = document.getElementById('edit-item-name');
         const editQuantityInput = document.getElementById('edit-item-quantity');
-        const editEntryDateInput = document.getElementById('edit-item-entrydate'); // NOVO INPUT
+        const editEntryDateInput = document.getElementById('edit-item-entrydate');
         const saveEditButton = document.getElementById('save-edit-button');
         const openDeleteConfirmButton = document.getElementById('open-delete-confirm-button');
         const closeModalButton = document.getElementById('close-modal-button');
@@ -493,162 +603,248 @@
         function openEditModal(itemId) {
             const item = stockItems.find(i => i.id === itemId);
             if (!item) {
-                showMessage(`Erro: Item com ID ${itemId} não encontrado.`, 'error');
+                showMessage(`Erro: Transação com ID ${itemId} não encontrada.`, 'error');
                 return;
             }
-            
-            currentItemId = itemId; // Define o ID global
-            
+            currentItemId = itemId;
             editIdInput.value = item.id;
             editNameInput.value = item.name;
-            editQuantityInput.value = item.quantity;
-            editEntryDateInput.value = formatDateToBR(item.entryDate); // <-- AQUI USAMOS A NOVA FUNÇÃO
-            
+            editQuantityInput.value = item.quantity; // Permite editar a quantidade da transação
+            editEntryDateInput.value = formatDateToBR(item.entryDate);
             editModal.classList.remove('hidden');
         }
 
-        function closeEditModal() {
-            editModal.classList.add('hidden');
-        }
+        function closeEditModal() { if(editModal) editModal.classList.add('hidden'); }
 
         function openConfirmModal() {
             const item = stockItems.find(i => i.id === currentItemId);
              if (!item) return;
-
-            // Fecha o modal de edição primeiro
             closeEditModal(); 
-            
-            document.getElementById('item-name-to-delete').textContent = item.name;
-            confirmModal.classList.remove('hidden');
+             const nameToDelete = document.getElementById('item-name-to-delete');
+             if (nameToDelete) nameToDelete.textContent = item.name;
+             if (confirmModal) confirmModal.classList.remove('hidden');
         }
         
-        function closeConfirmModal() {
-             confirmModal.classList.add('hidden');
-        }
+        function closeConfirmModal() { if (confirmModal) confirmModal.classList.add('hidden'); }
         
         function saveItemEdit() {
-            const itemId = parseInt(editIdInput.value, 10);
-            const newName = editNameInput.value.trim();
-            const newQuantity = parseInt(editQuantityInput.value, 10);
+            const itemId = currentItemId; // Usa o ID global
+             if (!itemId) {
+                 showMessage("Erro: ID do item não encontrado para salvar.", "error");
+                 return;
+             }
+            const newName = editNameInput ? editNameInput.value.trim() : null;
+            const newQuantity = editQuantityInput ? parseInt(editQuantityInput.value) : NaN; // Não usa 10 como base
 
-            if (isNaN(newQuantity) || newQuantity < 0 || !newName) {
-                showMessage('Por favor, insira um nome e quantidade válidos.', 'error'); 
+            // Valida se a quantidade é um número (pode ser negativo)
+            if (isNaN(newQuantity) || !newName) {
+                showMessage('Por favor, insira um nome e quantidade válidos (pode ser negativo).', 'error'); 
                 return;
             }
 
             const index = stockItems.findIndex(i => i.id === itemId);
             if (index !== -1) {
-                // Atualiza o item no array local (entryDate não é atualizada)
                 stockItems[index].name = newName;
                 stockItems[index].quantity = newQuantity;
-                
-                saveItems(); // Salva no LocalStorage
-                renderAllItems(); // Re-renderiza a tabela
+                // Poderíamos adicionar outros campos para edição aqui (ex: data, fornecedor)
+                saveItems();
+                renderAllItems(); 
                 closeEditModal();
-                showMessage(`Item "${newName}" atualizado com sucesso!`, 'success');
+                showMessage(`Transação "${newName}" atualizada com sucesso!`, 'success');
             } else {
-                 showMessage(`Erro ao salvar: Item com ID ${itemId} não encontrado.`, 'error');
+                 showMessage(`Erro ao salvar: Transação com ID ${itemId} não encontrada.`, 'error');
             }
         }
         
         function deleteItem() {
-            // Filtra o array removendo o item
+             if (!currentItemId) {
+                 showMessage("Erro: ID do item não encontrado para exclusão.", "error");
+                 return;
+             }
             const itemToDelete = stockItems.find(i => i.id === currentItemId);
+             if (!itemToDelete) {
+                 showMessage("Erro: Item a ser excluído não encontrado.", "error");
+                 closeConfirmModal();
+                 return;
+             }
             stockItems = stockItems.filter(i => i.id !== currentItemId);
-            
-            saveItems(); // Salva no LocalStorage
-            renderAllItems(); // Re-renderiza a tabela
+            saveItems();
+            renderAllItems(); 
             closeConfirmModal();
-            showMessage(`Item "${itemToDelete.name}" excluído com sucesso.`, 'success');
+            showMessage(`Transação "${itemToDelete.name}" excluída com sucesso.`, 'success');
+             currentItemId = null; // Limpa o ID após exclusão
+        }
+
+        // --- Lógica do Modal de Detalhes (Histórico) ---
+        const detailsModal = document.getElementById('details-modal');
+        const detailsItemName = document.getElementById('details-item-name');
+        const detailsTotalQuantity = document.getElementById('details-total-quantity');
+        const detailsTableBody = document.getElementById('details-entries-table-body');
+        const closeDetailsModalButton = document.getElementById('close-details-modal-button');
+        const detailsModalOverlay = document.getElementById('details-modal-overlay');
+
+        function openDetailsModal(itemName) {
+            // Recarrega os itens frescos do localStorage para garantir dados atualizados
+            loadItems(); 
+            
+            const entries = stockItems.filter(item => item.name === itemName);
+            if (entries.length === 0) {
+                // Não mostra erro se simplesmente não há histórico
+                // showMessage(`Nenhum histórico encontrado para "${itemName}".`, 'info');
+                // return; // Decide se quer parar ou mostrar o modal vazio
+            }
+            
+            const totalQuantity = entries.reduce((sum, item) => sum + item.quantity, 0);
+
+             if (detailsItemName) detailsItemName.textContent = itemName;
+             if (detailsTotalQuantity) detailsTotalQuantity.textContent = totalQuantity.toLocaleString('pt-BR');
+            
+             if (detailsTableBody) {
+                detailsTableBody.innerHTML = ''; // Limpa a tabela
+                entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Ordena mais novo primeiro
+
+                entries.forEach(entry => {
+                    const isEntry = entry.quantity > 0;
+                    const qtyClass = isEntry ? 'text-green-600' : 'text-red-600';
+                    const qtyPrefix = isEntry ? '+' : '';
+
+                    const row = `
+                        <tr class="text-sm text-gray-600">
+                            <td>${formatDateToBR(entry.entryDate)}</td>
+                            <td class="font-medium ${qtyClass}">${qtyPrefix}${entry.quantity}</td>
+                            <td>${entry.supplier || 'N/A'}</td>
+                            <td>${formatTimestampToBR(entry.createdAt)}</td>
+                            <td>
+                                <button data-item-id="${entry.id}" class="edit-btn-modal text-gray-500 hover:text-indigo-600 focus:outline-none p-1" title="Editar este registro">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    detailsTableBody.insertAdjacentHTML('beforeend', row);
+                });
+
+                // Reatribui listeners DENTRO do modal
+                detailsTableBody.querySelectorAll('.edit-btn-modal').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const itemId = parseInt(e.currentTarget.dataset.itemId);
+                         if (!isNaN(itemId)) {
+                            closeDetailsModal(); 
+                            openEditModal(itemId); 
+                         }
+                    });
+                });
+             } // Fim if(detailsTableBody)
+            
+             if (detailsModal) detailsModal.classList.remove('hidden');
+        }
+
+        function closeDetailsModal() {
+             if (detailsModal) detailsModal.classList.add('hidden');
         }
 
 
         // --- Lógica de Busca ---
+        const searchInput = document.getElementById('search-input');
+         if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const aggregatedList = getAggregatedStock(); 
 
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filteredItems = stockItems.filter(item => 
-                item.name.toLowerCase().includes(searchTerm) ||
-                item.supplier.toLowerCase().includes(searchTerm) ||
-                item.type.toLowerCase().includes(searchTerm)
-            );
-            // Chama a função de atualização com a lista filtrada
-            updateSummaryAndTable(filteredItems);
-        });
+                if (searchTerm === '') {
+                    updateStockTable(aggregatedList);
+                    return;
+                }
+                
+                const filteredItems = aggregatedList.filter(item => 
+                     (item.name && item.name.toLowerCase().includes(searchTerm)) || // Verifica se 'name' existe
+                     (item.supplier && item.supplier.toLowerCase().includes(searchTerm)) ||
+                     (item.type && item.type.toLowerCase().includes(searchTerm)) // Verifica se 'type' existe
+                );
+                
+                updateStockTable(filteredItems);
+            });
+         }
+
 
         // --- Renderização Principal ---
-
         function renderAllItems() {
-            loadItems(); // Carrega os dados mais recentes do LocalStorage (agora sem demo)
-            updateSummaryAndTable(stockItems); // Renderiza a tabela e os cards com todos os itens
+            loadItems(); 
+            const aggregatedList = getAggregatedStock(); 
+            updateSummaryCards(); 
+            updateStockTable(aggregatedList); 
         }
 
         // --- Inicialização e Listeners ---
-        
         document.addEventListener('DOMContentLoaded', () => {
             renderAllItems();
 
-            // NOVO: Verifica se há mensagem de sucesso vinda do cadastro
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('status') && urlParams.get('status') === 'success') {
                 showMessage('Item cadastrado com sucesso!', 'success');
-                // Limpa o parâmetro da URL para evitar que a mensagem apareça em recarregamentos
-                history.replaceState(null, '', window.location.pathname);
+                 try { // Evita erro se history.replaceState não for suportado
+                    history.replaceState(null, '', window.location.pathname);
+                 } catch(e) { console.warn("history.replaceState não suportado?"); }
             }
             
-            // Listeners do Modal de Edição
-            saveEditButton.addEventListener('click', saveItemEdit);
-            closeModalButton.addEventListener('click', closeEditModal);
-            openDeleteConfirmButton.addEventListener('click', openConfirmModal);
-            
-            // Listeners do Modal de Confirmação
-            confirmDeleteButton.addEventListener('click', deleteItem);
-            cancelDeleteButton.addEventListener('click', () => {
-                closeConfirmModal();
-                openEditModal(currentItemId); // Volta para o modal de edição
-            });
-            
-            // Adiciona listener ao plano de fundo para fechar os modais
-            editModal.querySelector('.bg-opacity-75').addEventListener('click', closeEditModal);
-            confirmModal.querySelector('.bg-opacity-75').addEventListener('click', closeConfirmModal);
+            // Listeners dos Modais - Verifica se os elementos existem antes de adicionar listeners
+             if (saveEditButton) saveEditButton.addEventListener('click', saveItemEdit);
+             if (closeModalButton) closeModalButton.addEventListener('click', closeEditModal);
+             if (openDeleteConfirmButton) openDeleteConfirmButton.addEventListener('click', openConfirmModal);
+             if (confirmDeleteButton) confirmDeleteButton.addEventListener('click', deleteItem);
+             if (cancelDeleteButton) cancelDeleteButton.addEventListener('click', closeConfirmModal);
+             if (closeDetailsModalButton) closeDetailsModalButton.addEventListener('click', closeDetailsModal);
+             if (detailsModalOverlay) detailsModalOverlay.addEventListener('click', closeDetailsModal);
+             
+             const editModalBg = editModal ? editModal.querySelector('.bg-opacity-75') : null;
+             const confirmModalBg = confirmModal ? confirmModal.querySelector('.bg-opacity-75') : null;
+             if (editModalBg) editModalBg.addEventListener('click', closeEditModal);
+             if (confirmModalBg) confirmModalBg.addEventListener('click', closeConfirmModal);
 
+
+            // Listeners dos Cards de Filtro - Verifica se os cards existem
+             const cardTotal = document.getElementById('card-total');
+             const cardRaw = document.getElementById('card-raw');
+             const cardFinished = document.getElementById('card-finished');
+             const cardLowStock = document.getElementById('card-low-stock');
+
+             if (cardTotal && searchInput) cardTotal.addEventListener('click', () => { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); });
+             if (cardRaw && searchInput) cardRaw.addEventListener('click', () => { searchInput.value = 'materia-prima'; searchInput.dispatchEvent(new Event('input')); });
+             if (cardFinished && searchInput) cardFinished.addEventListener('click', () => { searchInput.value = 'produto-acabado'; searchInput.dispatchEvent(new Event('input')); });
+             if (cardLowStock && searchInput) cardLowStock.addEventListener('click', () => { 
+                 searchInput.value = ''; 
+                 const lowStockItems = getAggregatedStock().filter(item => item.quantity <= item.minQuantity);
+                 updateStockTable(lowStockItems);
+             });
             
             // Lógica do Sidebar (Responsividade)
             const sidebar = document.getElementById('sidebar');
             const openBtn = document.getElementById('open-sidebar');
             const closeBtn = document.getElementById('close-sidebar');
+             const mainWrapper = document.getElementById('main-wrapper'); // Pega o main-wrapper
 
-            document.getElementById('main-wrapper').addEventListener('click', (e) => {
-                if (window.innerWidth < 768 && sidebar.classList.contains('translate-x-0')) {
-                    if (e.target.closest('#open-sidebar') === null && e.target.closest('#close-sidebar') === null) {
-                        sidebar.classList.remove('translate-x-0');
-                        sidebar.classList.add('-translate-x-full');
-                    }
-                }
-            });
-
-            openBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                sidebar.classList.remove('-translate-x-full');
-                sidebar.classList.add('translate-x-0');
-            });
-
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                sidebar.classList.remove('translate-x-0');
-                sidebar.classList.add('-translate-x-full');
-            });
-
-            document.querySelectorAll('#sidebar a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', () => {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.remove('translate-x-0');
-                        sidebar.classList.add('-translate-x-full');
+             if (sidebar && openBtn && closeBtn && mainWrapper) { // Verifica se todos existem
+                mainWrapper.addEventListener('click', (e) => {
+                    // Fecha o sidebar se clicar fora dele em telas pequenas
+                    if (window.innerWidth < 768 && sidebar.classList.contains('translate-x-0')) {
+                        // Verifica se o clique NÃO foi no botão de abrir ou dentro do próprio sidebar
+                        if (!openBtn.contains(e.target) && !sidebar.contains(e.target)) {
+                            sidebar.classList.remove('translate-x-0');
+                            sidebar.classList.add('-translate-x-full');
+                        }
                     }
                 });
-            });
+                openBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.remove('-translate-x-full'); sidebar.classList.add('translate-x-0'); });
+                closeBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.remove('translate-x-0'); sidebar.classList.add('-translate-x-full'); });
+                
+                // Fecha o sidebar ao clicar em um link interno dele em telas pequenas
+                document.querySelectorAll('#sidebar a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', () => {
+                        if (window.innerWidth < 768) { sidebar.classList.remove('translate-x-0'); sidebar.classList.add('-translate-x-full'); }
+                    });
+                });
+             } // Fim if (sidebar && ...)
         });
-        
     </script>
 </body>
 </html>
