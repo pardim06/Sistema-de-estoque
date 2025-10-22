@@ -64,8 +64,18 @@
                 <!-- LINHA 1: Nome e Tipo -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="item-name" class="block text-sm font-medium text-gray-700">Nome do Item</label>
-                        <input type="text" name="item-name" id="item-name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <select name="item-name" id="item-name" required class="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+    <option value="">Selecione um item</option>
+    <option value="Tarugo aluminio">Tarugo aluminio</option>
+    <option value="Tarugo Poliacetal">Tarugo Poliacetal</option>
+    <option value="Bloco Poliacetal">Bloco Poliacetal</option>
+    <option value="Parafuso m4x12mm">Parafuso m4x12mm</option>
+    <option value="Parafuso m5x16mm">Parafuso m5x16mm</option>
+    <option value="Martelo">Martelo</option>
+    <option value="Porca sextavada M4">Porca sextavada M4</option>
+</select>
+
+                       
                     </div>
                     <div>
                         <label for="item-type" class="block text-sm font-medium text-gray-700">Tipo</label>
