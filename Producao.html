@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produção - Sistema de Estoque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+            min-height: 100vh;
+        }
+        .main-wrapper { 
+            background-color: #f4f7f9;
+            min-height: 100vh;
+        }
+        #complete-op-modal {
+            z-index: 50; 
+        }
+        /* Estilos para a lista de consumo (BOM) */
+        .bom-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+        .bom-item-name {
+            font-medium text-gray-700;
+        }
+        .bom-item-qty {
+            font-semibold text-gray-900;
+        }
+        .stock-status {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+        }
+        .stock-ok {
+            background-color: #dcfce7; /* green-100 */
+            color: #166534; /* green-800 */
+        }
+        .stock-fail {
+            background-color: #fee2e2; /* red-100 */
+            color: #991b1b; /* red-800 */
+        }
+    </style>
+</head>
+<body class="flex">
+
+    <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 bg-indigo-800 text-white w-64 p-4 z-30">
+        <div class="flex items-center justify-between mb-8">
+            <div class="text-2xl font-bold flex items-center">
+                <i class="fas fa-boxes-stacked mr-2 text-indigo-300"></i>
+                Estoque 
+            </div>
+            <button id="close-sidebar" class="md:hidden text-indigo-300 hover:text-white focus:outline-none">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <nav class="space-y-2">
+            <a href="dashboard.html" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
+                <i class="fas fa-chart-line mr-3"></i>
+                Dashboard
+            </a>
+            <a href="cadastro.html" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
+                <i class="fas fa-plus-circle mr-3"></i>
+                Cadastro de Item
+            </a>
+            <a href="#" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
+                <i class="fas fa-users mr-3"></i>
+                Clientes (Em desenvolvimento)
+            </a>
+            <a href="producao.html" class="flex items-center p-3 rounded-lg bg-indigo-900 text-indigo-100 font-medium">
+                <i class="fas fa-pallet mr-3"></i>
+                Produção
+            </a>
+            <a href="#" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 text-indigo-300 hover:text-white font-medium">
+                <i class="fas fa-truck mr-3"></i>
+                Entregas (Em desenvolvimento)
+            </a>
+        </nav>
+
+        <div class="absolute bottom-4 w-full pr-8">
+            <a href="index.html" class="flex items-center p-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium justify-center">
+                <i class="fas fa-sign-out-alt mr-2"></i>
+                Sair
+            </a>
+        </div>
+    </aside>
+
+    <div id="main-wrapper" class="flex-1 transition-all duration-300 main-wrapper">
+        
+        <header id="header-container" class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-20">
+            <button id="open-sidebar" class="md:hidden text-indigo-600 focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-semibold text-gray-800 ml-4 md:ml-0">Painel de Produção</h1>
+            <div class="flex items-center space-x-4">
+                <p class="text-sm text-gray-600 hidden sm:block">Olá, <span class="font-medium" id="user-name-display">test@t</span></p>
+                <div class="h-10 w-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold">T</div>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <div id="status-message-container" class="mb-4 hidden" role="alert">
+                <div id="status-message" class="p-4 rounded-lg shadow-md flex items-center justify-between">
+                    <p class="text-sm font-medium"></p>
+                    <button onclick="document.getElementById('status-message-container').classList.add('hidden')" class="text-white opacity-75 hover:opacity-100 focus:outline-none">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <section id="nova-ordem" class="bg-white p-8 rounded-2xl shadow-lg mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Iniciar Nova Ordem de Produção</h2>
+                <form id="op-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="op-product" class="block text-sm font-medium text-gray-700">Produto a Produzir</label>
+                            <select id="op-product" name="op-product" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <option value="Martelo">Martelo</option>
+                                </select>
+                        </div>
+                        <div>
+                            <label for="op-quantity" class="block text-sm font-medium text-gray-700">Quantidade a Produzir (no dia)</label>
+                            <input type="number" name="op-quantity" id="op-quantity" required min="1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Ex: 50">
+                        </div>
+                    </div>
+
+                    <div id="bom-consumption-details" class="hidden pt-4">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Consumo de Materiais (Estimado)</h3>
+                        <div id="bom-list" class="space-y-2">
+                            </div>
+                        <p id="stock-warning" class="mt-4 text-sm font-medium text-red-700 bg-red-100 p-3 rounded-lg hidden">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Estoque insuficiente para um ou mais itens.
+                        </p>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" id="start-op-button" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <i class="fas fa-play mr-2"></i>
+                            Iniciar Produção
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section id="ordens-em-andamento" class="bg-white p-8 rounded-2xl shadow-lg mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Ordens em Andamento</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OP ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qtd. Planejada</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="relative px-6 py-3">
+                                    <span class="sr-only">Ações</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="active-ops-table-body" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                    </table>
+                    <p id="no-active-ops-message" class="text-center text-gray-500 py-8 hidden">Nenhuma ordem em produção no momento.</p>
+                </div>
+            </section>
+            
+            <section id="historico-producao" class="bg-white p-8 rounded-2xl shadow-lg">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Histórico de Produção (Concluídas)</h2>
+                 <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OP ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qtd. Concluída</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Refugo</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Conclusão</th>
+                            </tr>
+                        </thead>
+                        <tbody id="completed-ops-table-body" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                    </table>
+                    <p id="no-completed-ops-message" class="text-center text-gray-500 py-8 hidden">Nenhuma ordem de produção foi concluída ainda.</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="complete-op-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div id="complete-op-overlay" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                <i class="fas fa-check text-green-600"></i>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Concluir Ordem de Produção</h3>
+                <div class="mt-4 space-y-4">
+                    <input type="hidden" id="complete-op-id">
+                    
+                    <div class="text-sm">
+                        <p>Produto: <span id="complete-op-name" class="font-bold text-gray-800"></span></p>
+                        <p>Qtd. Planejada: <span id="complete-op-planned" class="font-bold text-gray-800"></span></p>
+                    </div>
+
+                    <div>
+                        <label for="complete-op-actual" class="block text-sm font-medium text-gray-700">Quantidade Realmente Concluída</label>
+                        <input type="number" id="complete-op-actual" min="0" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="complete-op-scrap" class="block text-sm font-medium text-gray-700">Quantidade de Refugo</label>
+                        <input type="number" id="complete-op-scrap" readonly class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed">
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button type="button" id="confirm-complete-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+              Confirmar Conclusão
+            </button>
+            <button type="button" id="cancel-complete-button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+        // --- CONFIGURAÇÃO DE PRODUÇÃO ---
+
+        // (Ficha Técnica / Bill of Materials)
+        // Em um sistema real, isso viria do seu banco de dados / tela de cadastro.
+        // CÓDIGO NOVO E CORRIGIDO ✅
+const BILL_OF_MATERIALS = {
+    "Martelo": [
+        { name: "Tarugo Poliacetal", qty: 2 },
+        { name: "Bloco Poliacetal", qty: 2 },
+        { name: "Tarugo aluminio", qty: 1 },
+        { name: "Parafuso m4x12mm", qty: 2 },
+        { name: "Parafuso m5x16mm", qty: 1 },
+        { name: "Porca sextavada M4", qty: 2 } // Assumi que este nome está correto no seu cadastro
+    ]
+};
+
+        // --- VARIÁVEIS GLOBAIS ---
+        let stockItems = []; // Vem do 'stock_items'
+        let productionOrders = []; // Vem do 'production_orders'
+
+        // --- FUNÇÕES DE MENSAGEM (Copiado do dashboard) ---
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('status-message-container');
+            const msgElement = document.getElementById('status-message');
+            const textElement = msgElement.querySelector('p');
+            
+            msgElement.className = 'p-4 rounded-lg shadow-md flex items-center justify-between';
+            let bgColor, textColor;
+            switch (type) {
+                case 'success': bgColor = 'bg-green-500'; textColor = 'text-white'; break;
+                case 'error': bgColor = 'bg-red-600'; textColor = 'text-white'; break;
+                default: bgColor = 'bg-blue-500'; textColor = 'text-white'; break;
+            }
+
+            msgElement.classList.add(bgColor, textColor);
+            textElement.textContent = message;
+            container.classList.remove('hidden');
+
+            setTimeout(() => {
+                container.classList.add('hidden');
+            }, 5000);
+        }
+
+        // --- FUNÇÕES DE DADOS (LOCALSTORAGE) ---
+
+        function loadItems() {
+            try {
+                const storedItems = localStorage.getItem('stock_items');
+                stockItems = storedItems ? JSON.parse(storedItems) : [];
+            } catch (e) {
+                console.error("Erro ao carregar 'stock_items':", e);
+                showMessage("Erro fatal ao carregar estoque. Verifique o console.", 'error');
+            }
+        }
+
+        function saveItems() {
+            localStorage.setItem('stock_items', JSON.stringify(stockItems));
+        }
+
+        function loadProductionOrders() {
+            try {
+                const storedOrders = localStorage.getItem('production_orders');
+                productionOrders = storedOrders ? JSON.parse(storedOrders) : [];
+            } catch (e) {
+                console.error("Erro ao carregar 'production_orders':", e);
+                showMessage("Erro ao carregar ordens de produção.", 'error');
+            }
+        }
+
+        function saveProductionOrders() {
+            localStorage.setItem('production_orders', JSON.stringify(productionOrders));
+        }
+        
+        /**
+         * Calcula o estoque total de um item pelo NOME.
+         * Isso soma todas as entradas (positivas e negativas) do 'stock_items'.
+         */
+        function getStockByName(itemName) {
+            return stockItems
+                .filter(item => item.name.toLowerCase() === itemName.toLowerCase())
+                .reduce((total, item) => total + item.quantity, 0);
+        }
+
+        /**
+         * Retorna a data atual formatada (DD/MM/AAAA)
+         */
+        function getCurrentDateFormatted() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        // --- LÓGICA DO FORMULÁRIO (NOVA OP) ---
+        
+        const opProductSelect = document.getElementById('op-product');
+        const opQuantityInput = document.getElementById('op-quantity');
+        const bomDetailsDiv = document.getElementById('bom-consumption-details');
+        const bomListDiv = document.getElementById('bom-list');
+        const stockWarning = document.getElementById('stock-warning');
+        const startOpButton = document.getElementById('start-op-button');
+
+        /**
+         * Atualiza a lista de consumo e valida o estoque.
+         */
+        function updateConsumptionDetails() {
+            const productName = opProductSelect.value;
+            const quantity = parseInt(opQuantityInput.value, 10) || 0;
+            const bom = BILL_OF_MATERIALS[productName];
+
+            if (!bom || quantity <= 0) {
+                bomDetailsDiv.classList.add('hidden');
+                startOpButton.disabled = true;
+                return;
+            }
+
+            bomDetailsDiv.classList.remove('hidden');
+            bomListDiv.innerHTML = '';
+            let allStockAvailable = true;
+
+            bom.forEach(item => {
+                const neededQty = item.qty * quantity;
+                const currentStock = getStockByName(item.name);
+                const hasStock = currentStock >= neededQty;
+
+                if (!hasStock) {
+                    allStockAvailable = false;
+                }
+
+                const statusClass = hasStock ? 'stock-ok' : 'stock-fail';
+                const statusText = hasStock ? 'OK' : 'Insuficiente';
+
+                const itemHtml = `
+                    <div class="bom-item">
+                        <span class="bom-item-name">${item.name}</span>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-500">(Estoque: ${currentStock})</span>
+                            <span class="bom-item-qty">${neededQty} un.</span>
+                            <span class="stock-status ${statusClass}">${statusText}</span>
+                        </div>
+                    </div>
+                `;
+                bomListDiv.insertAdjacentHTML('beforeend', itemHtml);
+            });
+
+            if (allStockAvailable) {
+                stockWarning.classList.add('hidden');
+                startOpButton.disabled = false;
+            } else {
+                stockWarning.classList.remove('hidden');
+                startOpButton.disabled = true;
+            }
+        }
+
+        /**
+         * Lida com o início de uma nova Ordem de Produção.
+         */
+        function handleStartProduction(event) {
+            event.preventDefault();
+            
+            const productName = opProductSelect.value;
+            const plannedQty = parseInt(opQuantityInput.value, 10);
+            const bom = BILL_OF_MATERIALS[productName];
+            
+            if (!bom || !plannedQty || plannedQty <= 0) {
+                 showMessage("Selecione um produto e quantidade válida.", 'error');
+                 return;
+            }
+
+            // Confirmação final de estoque
+            let allStockAvailable = true;
+            for (const item of bom) {
+                const neededQty = item.qty * plannedQty;
+                const currentStock = getStockByName(item.name);
+                if (currentStock < neededQty) {
+                    allStockAvailable = false;
+                    break;
+                }
+            }
+
+            if (!allStockAvailable) {
+                showMessage("Não foi possível iniciar: Estoque insuficiente.", 'error');
+                updateConsumptionDetails(); // Re-exibe o aviso
+                return;
+            }
+
+            // 1. Criar a nova Ordem de Produção
+            const newOp = {
+                id: Date.now(),
+                product: productName,
+                planned: plannedQty,
+                status: 'Em Andamento',
+                createdAt: new Date().toISOString()
+            };
+            productionOrders.push(newOp);
+
+            // 2. Debitar matérias-primas do estoque (criando entradas negativas)
+            const today = new Date().toISOString().split('T')[0];
+            const now = new Date().toISOString();
+
+            bom.forEach(item => {
+                const consumedQty = item.qty * plannedQty;
+                const consumptionEntry = {
+                    id: Date.now() + Math.random(), // ID único
+                    name: item.name,
+                    type: 'materia-prima',
+                    quantity: -consumedQty, // <-- A MÁGICA ACONTECE AQUI
+                    minQuantity: 0,
+                    entryDate: today,
+                    supplier: `Produção OP #${newOp.id}`, // Rastreabilidade
+                    description: `Consumo p/ ${plannedQty} un. de ${productName}`,
+                    createdAt: now
+                };
+                stockItems.push(consumptionEntry);
+            });
+
+            // 3. Salvar tudo
+            saveItems();
+            saveProductionOrders();
+
+            // 4. Feedback e atualização da UI
+            showMessage(`Ordem de Produção #${newOp.id} iniciada! Matérias-primas debitadas.`, 'success');
+            document.getElementById('op-form').reset();
+            bomDetailsDiv.classList.add('hidden');
+            startOpButton.disabled = true;
+            renderProductionTables();
+        }
+
+
+        // --- LÓGICA DAS TABELAS (EM ANDAMENTO / HISTÓRICO) ---
+
+        const activeOpsTableBody = document.getElementById('active-ops-table-body');
+        const noActiveOpsMsg = document.getElementById('no-active-ops-message');
+        const completedOpsTableBody = document.getElementById('completed-ops-table-body');
+        const noCompletedOpsMsg = document.getElementById('no-completed-ops-message');
+
+        function renderProductionTables() {
+            activeOpsTableBody.innerHTML = '';
+            completedOpsTableBody.innerHTML = '';
+            
+            const activeOps = productionOrders.filter(op => op.status === 'Em Andamento');
+            const completedOps = productionOrders.filter(op => op.status === 'Concluída');
+
+            // Tabela de Ativas
+            if (activeOps.length === 0) {
+                noActiveOpsMsg.classList.remove('hidden');
+            } else {
+                noActiveOpsMsg.classList.add('hidden');
+                activeOps.sort((a, b) => b.createdAt.localeCompare(a.createdAt)); // Mais nova primeiro
+                activeOps.forEach(op => {
+                    const row = `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#${op.id}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${op.product}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${op.planned}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    Em Andamento
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button data-op-id="${op.id}" class="complete-btn inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                                    <i class="fas fa-check mr-1"></i> Concluir
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    activeOpsTableBody.insertAdjacentHTML('beforeend', row);
+                });
+            }
+            
+            // Tabela de Concluídas
+            if (completedOps.length === 0) {
+                noCompletedOpsMsg.classList.remove('hidden');
+            } else {
+                noCompletedOpsMsg.classList.add('hidden');
+                completedOps.sort((a, b) => b.completedAt.localeCompare(a.completedAt)); // Mais nova primeiro
+                completedOps.forEach(op => {
+                    const row = `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">#${op.id}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${op.product}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-700">${op.actual}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-700">${op.scrap}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${op.completedDate}</td>
+                        </tr>
+                    `;
+                    completedOpsTableBody.insertAdjacentHTML('beforeend', row);
+                });
+            }
+            
+            // Adiciona listeners aos novos botões "Concluir"
+            document.querySelectorAll('.complete-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const opId = parseInt(e.currentTarget.dataset.opId, 10);
+                    openCompleteModal(opId);
+                });
+            });
+        }
+
+        // --- LÓGICA DO MODAL (CONCLUIR OP) ---
+        
+        const completeModal = document.getElementById('complete-op-modal');
+        const completeOpId = document.getElementById('complete-op-id');
+        const completeOpName = document.getElementById('complete-op-name');
+        const completeOpPlanned = document.getElementById('complete-op-planned');
+        const completeOpActual = document.getElementById('complete-op-actual');
+        const completeOpScrap = document.getElementById('complete-op-scrap');
+
+        function openCompleteModal(opId) {
+            const op = productionOrders.find(o => o.id === opId);
+            if (!op) {
+                showMessage(`Erro: Ordem de Produção #${opId} não encontrada.`, 'error');
+                return;
+            }
+            
+            completeOpId.value = op.id;
+            completeOpName.textContent = op.product;
+            completeOpPlanned.textContent = op.planned;
+            completeOpActual.value = op.planned; // Sugere o valor planejado
+            completeOpScrap.value = 0; // Padrão
+            
+            completeModal.classList.remove('hidden');
+        }
+
+        function closeCompleteModal() {
+            completeModal.classList.add('hidden');
+        }
+
+        // Cálculo automático de refugo
+        completeOpActual.addEventListener('input', () => {
+            const planned = parseInt(completeOpPlanned.textContent, 10);
+            const actual = parseInt(completeOpActual.value, 10);
+            
+            if (isNaN(actual) || actual < 0) {
+                completeOpScrap.value = 0;
+                return;
+            }
+            
+            const scrap = planned - actual;
+            completeOpScrap.value = scrap < 0 ? 0 : scrap; // Refugo não pode ser negativo
+        });
+
+        function handleCompleteProduction() {
+            const opId = parseInt(completeOpId.value, 10);
+            const actualQty = parseInt(completeOpActual.value, 10);
+            const scrapQty = parseInt(completeOpScrap.value, 10);
+            
+            if (isNaN(actualQty) || actualQty < 0) {
+                 showMessage("Por favor, insira uma Quantidade Concluída válida.", 'error');
+                 return;
+            }
+            
+            const opIndex = productionOrders.findIndex(o => o.id === opId);
+            if (opIndex === -1) {
+                showMessage(`Erro: Ordem #${opId} não encontrada ao salvar.`, 'error');
+                return;
+            }
+
+            // 1. Atualizar a Ordem de Produção
+            const op = productionOrders[opIndex];
+            op.status = 'Concluída';
+            op.actual = actualQty;
+            op.scrap = scrapQty;
+            op.completedAt = new Date().toISOString();
+            op.completedDate = getCurrentDateFormatted(); // Data simples para a tabela
+
+            // 2. Adicionar o Produto Acabado ao estoque (entrada positiva)
+            if (actualQty > 0) {
+                 const finishedProductEntry = {
+                    id: Date.now(),
+                    name: op.product, // "Martelo"
+                    type: 'produto-acabado',
+                    quantity: actualQty,
+                    minQuantity: 10, // Você pode definir um padrão
+                    entryDate: new Date().toISOString().split('T')[0],
+                    supplier: `Produção OP #${op.id}`, // Rastreabilidade
+                    description: `Saída da Produção #${op.id}`,
+                    createdAt: op.completedAt
+                };
+                stockItems.push(finishedProductEntry);
+                saveItems();
+            }
+
+            // 3. Salvar e atualizar UI
+            saveProductionOrders();
+            showMessage(`Ordem #${op.id} concluída! ${actualQty} un. de ${op.product} adicionadas ao estoque.`, 'success');
+            closeCompleteModal();
+            renderProductionTables();
+        }
+
+        // --- INICIALIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Carrega os dados
+            loadItems();
+            loadProductionOrders();
+            
+            // Renderiza as tabelas
+            renderProductionTables();
+
+            // Listeners do formulário de Nova OP
+            opProductSelect.addEventListener('change', updateConsumptionDetails);
+            opQuantityInput.addEventListener('input', updateConsumptionDetails);
+            document.getElementById('op-form').addEventListener('submit', handleStartProduction);
+            
+            // Listeners do Modal de Conclusão
+            document.getElementById('confirm-complete-button').addEventListener('click', handleCompleteProduction);
+            document.getElementById('cancel-complete-button').addEventListener('click', closeCompleteModal);
+            document.getElementById('complete-op-overlay').addEventListener('click', closeCompleteModal);
+
+            // Lógica do Sidebar (Responsividade)
+            const sidebar = document.getElementById('sidebar');
+            const openBtn = document.getElementById('open-sidebar');
+            const closeBtn = document.getElementById('close-sidebar');
+
+            document.getElementById('main-wrapper').addEventListener('click', (e) => {
+                if (window.innerWidth < 768 && sidebar.classList.contains('translate-x-0')) {
+                    if (e.target.closest('#open-sidebar') === null && e.target.closest('#close-sidebar') === null) {
+                        sidebar.classList.remove('translate-x-0');
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                }
+            });
+
+            openBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+            });
+
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.remove('translate-x-0');
+                sidebar.classList.add('-translate-x-full');
+            });
+
+            document.querySelectorAll('#sidebar a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', () => {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.remove('translate-x-0');
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                });
+            });
+        });
+        
+    </script>
+</body>
+</html>
