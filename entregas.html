@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entregas - Sistema de Estoque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700&display=swap" rel="stylesheet">
+   
+   <style>
+        body { font-family: 'Inter', sans-serif; color: #E2E8F0; }
+        h1, h2, h3, h4, h5, h6, .font-poppins { font-family: 'Poppins', sans-serif; font-weight: 700; }
+        .sidebar { transition: transform 0.3s ease-in-out; min-height: 100vh; }
+        .main-wrapper { background-color: #0A1628; min-height: 100vh; }
+        html { scroll-behavior: smooth; }
+        .card-glossy {
+            background-color: rgba(28, 44, 68, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .delivery-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.1);
+        }
+   </style>
+</head>
+<body class="bg-[#0A1628]">
+
+    <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 bg-[#0A1628] text-white w-64 p-4 z-30 border-r border-white/10">
+        <div class="flex items-center justify-between mb-8">
+            <div class="text-2xl font-poppins flex items-center">
+                <i class="fas fa-boxes-stacked mr-2 text-[#3B82F6]"></i>
+                Estoque 
+            </div>
+            <button id="close-sidebar" class="md:hidden text-gray-400 hover:text-white focus:outline-none">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <nav class="space-y-2">
+            <a href="dashboard.html" data-page="dashboard" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fas fa-chart-line mr-3"></i>
+                Dashboard
+            </a>
+            <a href="cadastro.html" data-page="cadastro" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fas fa-plus-circle mr-3"></i>
+                Cadastro de Item
+            </a>
+            <a href="producao.html" data-page="producao" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fas fa-pallet mr-3"></i>
+                Produção 
+            </a>
+            <a href="clientes.html" data-page="clientes" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fas fa-users mr-3"></i>
+                Clientes
+            </a>
+            <a href="entregas.html" data-page="entregas" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fas fa-truck mr-3"></i>
+                Entregas
+            </a>
+        </nav>
+        <div class="absolute bottom-4 w-full pr-8">
+            <a href="index.html" class="flex items-center p-3 rounded-lg bg-red-600/80 hover:bg-red-600 text-white font-medium justify-center transition-colors">
+                <i class="fas fa-sign-out-alt mr-2"></i>
+                Sair
+            </a>
+        </div>
+    </aside>
+
+    <div id="main-wrapper" class="md:pl-64 transition-all duration-300 main-wrapper">
+        
+        <header id="header-container" class="bg-gray-900/50 backdrop-blur-lg border-b border-white/10 p-4 flex justify-between items-center sticky top-0 z-20">
+            <button id="open-sidebar" class="md:hidden text-[#3B82F6] focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-poppins text-white ml-4 md:ml-0">Cadastro e Saída</h1>
+            <div class="flex items-center space-x-4">
+                <p class="text-sm text-gray-300 hidden sm:block">Olá, <span class="font-medium text-white" id="user-name-display">test@t</span></p>
+                <div class="h-10 w-10 bg-[#3B82F6] rounded-full flex items-center justify-center text-white font-bold ring-2 ring-white/20">T</div>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <div id="status-message-container" class="mb-4 hidden" role="alert">
+                <div id="status-message" class="p-4 rounded-lg shadow-lg flex items-center justify-between">
+                    <p class="text-sm font-medium"></p>
+                    <button onclick="document.getElementById('status-message-container').classList.add('hidden')" class="text-white opacity-75 hover:opacity-100 focus:outline-none">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <section id="novo-cliente" class="card-glossy p-8 rounded-2xl shadow-lg mb-8">
+                <h2 class="text-2xl font-poppins text-white mb-6">Cadastrar Novo Cliente</h2>
+                <form id="new-client-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="new-client-name" class="block text-sm font-medium text-gray-300">Nome</label>
+                            <input type="text" id="new-client-name" required class="mt-1 block w-full px-3 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label for="new-client-email" class="block text-sm font-medium text-gray-300">Email</label>
+                            <input type="email" id="new-client-email" class="mt-1 block w-full px-3 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label for="new-client-phone" class="block text-sm font-medium text-gray-300">Telefone</label>
+                            <input type="tel" id="new-client-phone" class="mt-1 block w-full px-3 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="new-client-address" class="block text-sm font-medium text-gray-300">Endereço</label>
+                        <input type="text" id="new-client-address" class="mt-1 block w-full px-3 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
+                    </div>
+                    <div class="flex justify-end pt-4">
+                        <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-lg shadow-blue-500/30 text-sm font-medium rounded-md text-white bg-[#3B82F6] hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3B82F6]">
+                            <i class="fas fa-plus mr-2"></i>
+                            Adicionar Cliente
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section id="nova-entrega" class="card-glossy p-8 rounded-2xl shadow-lg mb-8">
+                <h2 class="text-2xl font-poppins text-white mb-6">Registrar Nova Entrega (Saída)</h2>
+                
+                <form id="delivery-form" class="space-y-6">
+                    <div>
+                        <label for="delivery-client" class="block text-sm font-medium text-gray-300">Cliente</label>
+                        <select id="delivery-client" required class="mt-1 block w-full pl-3 pr-10 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
+                            <option value="" class="bg-gray-800">Selecione um cliente...</option>
+                            </select>
+                    </div>
+
+                    <div class="pt-4 border-t border-white/10">
+                        <h3 class="text-lg font-poppins text-gray-200 mb-4">Itens da Entrega</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div class="md:col-span-2">
+                                <label for="delivery-product" class="block text-sm font-medium text-gray-300">Produto Acabado</label>
+                                <select id="delivery-product" class="mt-1 block w-full pl-3 pr-10 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
+                                    <option value="" class="bg-gray-800">Selecione um produto...</option>
+                                    </select>
+                            </div>
+                            <div>
+                                <label for="delivery-quantity" class="block text-sm font-medium text-gray-300">Quantidade</label>
+                                <input type="number" id="delivery-quantity" min="1" class="mt-1 block w-full px-3 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
+                            </div>
+                        </div>
+                         <div class="flex justify-end mt-4">
+                             <button type="button" id="add-item-button" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none">
+                                <i class="fas fa-plus mr-2"></i>
+                                Adicionar Item à Lista
+                            </button>
+                         </div>
+                    </div>
+
+                    <div id="delivery-items-list" class="space-y-2">
+                        </div>
+
+                    <div class="pt-6 border-t border-white/10">
+                        <h3 class="text-lg font-poppins text-gray-200 mb-4">Assinatura Digital (Recebimento)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="delivery-receiver-name" class="block text-sm font-medium text-gray-300">Nome do Recebedor</label>
+                                <input type="text" id="delivery-receiver-name" required class="mt-1 block w-full px-3 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
+                            </div>
+                            <div>
+                                <label for="delivery-receiver-doc" class="block text-sm font-medium text-gray-300">Documento (CPF/RG)</label>
+                                <input type="text" id="delivery-receiver-doc" required class="mt-1 block w-full px-3 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-6 border-t border-white/10">
+                        <button type="submit" id="confirm-delivery-button" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-lg shadow-blue-500/30 text-sm font-medium rounded-md text-white bg-[#3B82F6] hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3B82F6] disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-check mr-2"></i>
+                            Confirmar e Registrar Entrega
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section id="lista-entregas" class="card-glossy p-8 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-poppins text-white mb-6">Histórico de Entregas</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-white/10">
+                        
+                        <thead class="bg-white/5">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Entrega ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Cliente</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Data</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Itens</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Recebedor</th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody id="deliveries-table-body" class="divide-y divide-white/10">
+                            </tbody>
+                    </table>
+                    <p id="no-deliveries-message" class="text-center text-gray-400 py-8 hidden">Nenhuma entrega registrada.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+      
+    <script>
+        // Variáveis globais de dados
+        let clients = [];
+        let stockItems = [];
+        let aggregatedStock = new Map();
+        let deliveries = [];
+        
+        // Itens temporários para a entrega atual
+        let currentDeliveryItems = [];
+
+        // Elementos do DOM (Formulário Cliente)
+        const newClientForm = document.getElementById('new-client-form');
+
+        // Elementos do DOM (Formulário Entrega)
+        const clientSelect = document.getElementById('delivery-client');
+        const productSelect = document.getElementById('delivery-product');
+        const quantityInput = document.getElementById('delivery-quantity');
+        const addItemButton = document.getElementById('add-item-button');
+        const itemsListDiv = document.getElementById('delivery-items-list');
+        const deliveryForm = document.getElementById('delivery-form');
+        const deliveriesTableBody = document.getElementById('deliveries-table-body');
+        const noDeliveriesMessage = document.getElementById('no-deliveries-message');
+
+        // --- Funções de Mensagem de Status ---
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('status-message-container');
+            const msgElement = document.getElementById('status-message');
+            const textElement = msgElement.querySelector('p');
+            
+            msgElement.className = 'p-4 rounded-lg shadow-lg flex items-center justify-between';
+            let bgColor, textColor;
+            switch (type) {
+                case 'success': bgColor = 'bg-[#10B981]'; textColor = 'text-white'; break;
+                case 'error': bgColor = 'bg-red-600'; textColor = 'text-white'; break;
+                default: bgColor = 'bg-[#3B82F6]'; textColor = 'text-white'; break;
+            }
+
+            msgElement.classList.add(bgColor, textColor);
+            textElement.textContent = message;
+            container.classList.remove('hidden');
+
+             setTimeout(() => {
+                 if (container) container.classList.add('hidden');
+             }, 5000);
+        }
+
+        // --- Funções de Dados (Local Storage) ---
+        function loadClients() {
+            try {
+                const storedClients = localStorage.getItem('clientes');
+                clients = storedClients ? JSON.parse(storedClients) : [];
+            } catch (e) { clients = []; }
+        }
+        function saveClients() {
+            localStorage.setItem('clientes', JSON.stringify(clients));
+        }
+        
+        function loadStockItems() {
+            try {
+                const storedItems = localStorage.getItem('stock_items');
+                stockItems = storedItems ? JSON.parse(storedItems) : [];
+            } catch (e) { stockItems = []; }
+        }
+        function saveStockItems() {
+            localStorage.setItem('stock_items', JSON.stringify(stockItems));
+        }
+        
+        function loadDeliveries() {
+            try {
+                const storedDeliveries = localStorage.getItem('entregas');
+                deliveries = storedDeliveries ? JSON.parse(storedDeliveries) : [];
+            } catch (e) { deliveries = []; }
+        }
+        function saveDeliveries() {
+             localStorage.setItem('entregas', JSON.stringify(deliveries));
+        }
+        
+        function getAggregatedStock() {
+            aggregatedStock.clear();
+            for (const item of stockItems) {
+                if (!aggregatedStock.has(item.name)) {
+                    aggregatedStock.set(item.name, { 
+                        name: item.name,
+                        quantity: 0,
+                        type: item.type,
+                    });
+                }
+                aggregatedStock.get(item.name).quantity += item.quantity;
+            }
+        }
+        
+        function getStockByName(itemName) {
+            return aggregatedStock.get(itemName)?.quantity || 0;
+        }
+
+        // --- Funções de Renderização e Preenchimento ---
+        
+        function populateClientSelect() {
+            clientSelect.innerHTML = '<option value="" class="bg-gray-800">Selecione um cliente...</option>';
+            clients.sort((a, b) => a.name.localeCompare(b.name));
+            clients.forEach(client => {
+                const option = `<option value="${client.id}" data-name="${client.name}" class="bg-gray-800">${client.name}</option>`;
+                clientSelect.insertAdjacentHTML('beforeend', option);
+            });
+        }
+        
+        function populateProductSelect() {
+            productSelect.innerHTML = '<option value="" class="bg-gray-800">Selecione um produto...</option>';
+            const finishedProducts = Array.from(aggregatedStock.values())
+                .filter(item => item.type === 'produto-acabado' && item.quantity > 0)
+                .sort((a, b) => a.name.localeCompare(b.name));
+                
+            finishedProducts.forEach(item => {
+                const option = `<option value="${item.name}" class="bg-gray-800">${item.name} (Estoque: ${item.quantity})</option>`;
+                productSelect.insertAdjacentHTML('beforeend', option);
+            });
+        }
+        
+        function renderCurrentDeliveryItems() {
+            itemsListDiv.innerHTML = '';
+            if (currentDeliveryItems.length === 0) {
+                itemsListDiv.innerHTML = '<p class="text-sm text-gray-400 text-center">Nenhum item adicionado à entrega.</p>';
+                return;
+            }
+            
+            currentDeliveryItems.forEach((item, index) => {
+                const itemHtml = `
+                    <div class="delivery-item">
+                        <span class="text-gray-300">
+                            <span class="font-medium text-white">${item.name}</span> x ${item.quantity}
+                        </span>
+                        <button type="button" onclick="removeItem(${index})" class="text-red-500 hover:text-red-400" title="Remover">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                itemsListDiv.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        }
+        
+        // renderDeliveriesTable (com recebedor)
+        function renderDeliveriesTable() {
+            deliveriesTableBody.innerHTML = '';
+            if (deliveries.length === 0) {
+                noDeliveriesMessage.classList.remove('hidden');
+            } else {
+                noDeliveriesMessage.classList.add('hidden');
+            }
+            
+            deliveries.sort((a, b) => b.id - a.id); // Mais recentes primeiro
+
+            deliveries.forEach(delivery => {
+                const itemsSummary = delivery.items.map(item => `${item.name} (x${item.quantity})`).join(', ');
+                
+                const receiverName = delivery.receiverName || 'N/A'; // Pega o nome do recebedor
+
+                const row = `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">#${delivery.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${delivery.clientName}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${delivery.date}</td>
+                        <td class="px-6 py-4 text-sm text-gray-300">${itemsSummary}</td>
+                        
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${receiverName}</td>
+                    </tr>
+                `;
+                deliveriesTableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // --- Lógica de Ações (Formulário Cliente) ---
+        newClientForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nameInput = document.getElementById('new-client-name');
+            const emailInput = document.getElementById('new-client-email');
+            const phoneInput = document.getElementById('new-client-phone');
+            const addressInput = document.getElementById('new-client-address');
+            
+            const name = nameInput.value.trim();
+            if (!name) {
+                showMessage('O nome do cliente é obrigatório.', 'error');
+                return;
+            }
+
+            const newClient = {
+                id: Date.now(),
+                name: name,
+                email: emailInput.value,
+                phone: phoneInput.value,
+                address: addressInput.value
+            };
+
+            clients.push(newClient); // Adiciona ao array global
+            saveClients(); // Salva no LocalStorage
+            
+            showMessage('Cliente cadastrado com sucesso!', 'success');
+            newClientForm.reset();
+            
+            // Atualiza o select de entregas
+            populateClientSelect();
+            
+            // Seleciona o cliente recém-criado
+            clientSelect.value = newClient.id;
+        });
+
+
+        // --- Lógica de Ações (Formulário Entrega) ---
+        function handleAddItem() {
+            const productName = productSelect.value;
+            const quantity = parseInt(quantityInput.value, 10);
+            
+            if (!productName || !quantity || quantity <= 0) {
+                showMessage('Selecione um produto e uma quantidade válida.', 'error');
+                return;
+            }
+            
+            const availableStock = getStockByName(productName);
+            const alreadyInList = currentDeliveryItems.reduce((sum, item) => (item.name === productName ? sum + item.quantity : sum), 0);
+            
+            if (quantity > (availableStock - alreadyInList)) {
+                showMessage(`Estoque insuficiente. Disponível: ${availableStock}. Na lista: ${alreadyInList}.`, 'error');
+                return;
+            }
+            
+            currentDeliveryItems.push({ name: productName, quantity: quantity });
+            renderCurrentDeliveryItems();
+            
+            productSelect.value = '';
+            quantityInput.value = '';
+        }
+        
+        function removeItem(index) {
+            currentDeliveryItems.splice(index, 1);
+            renderCurrentDeliveryItems();
+        }
+        
+        // handleConfirmDelivery (com assinatura)
+        function handleConfirmDelivery(event) {
+            event.preventDefault();
+            
+            const clientId = clientSelect.value;
+            const receiverNameInput = document.getElementById('delivery-receiver-name');
+            const receiverDocInput = document.getElementById('delivery-receiver-doc');
+            
+            const receiverName = receiverNameInput.value.trim();
+            const receiverDoc = receiverDocInput.value.trim();
+
+            if (!clientId) {
+                showMessage('Selecione um cliente.', 'error');
+                return;
+            }
+            
+            if (currentDeliveryItems.length === 0) {
+                showMessage('Adicione pelo menos um item à entrega.', 'error');
+                return;
+            }
+
+            // Validação de assinatura
+            if (!receiverName || !receiverDoc) {
+                showMessage('O Nome e Documento do Recebedor são obrigatórios.', 'error');
+                return;
+            }
+            
+            const clientName = clientSelect.options[clientSelect.selectedIndex].dataset.name;
+            const deliveryId = Date.now();
+            const today = new Date();
+            const todayFormatted = today.toLocaleDateString('pt-BR');
+            const todayISO = today.toISOString().split('T')[0];
+
+            // 1. Debitar do estoque
+            currentDeliveryItems.forEach(item => {
+                const stockMovement = {
+                    id: Date.now() + Math.random(),
+                    name: item.name,
+                    type: 'produto-acabado',
+                    quantity: -item.quantity, // Negativo para saída
+                    minQuantity: 0,
+                    entryDate: todayISO,
+                    supplier: `Entrega #${deliveryId} (${clientName})`,
+                    description: `Saída para cliente ${clientName}`,
+                    createdAt: today.toISOString()
+                };
+                stockItems.push(stockMovement);
+            });
+            
+            // 2. Criar o registro da entrega (COM DADOS DA ASSINATURA)
+            const newDelivery = {
+                id: deliveryId,
+                clientId: clientId,
+                clientName: clientName,
+                date: todayFormatted,
+                items: [...currentDeliveryItems],
+                receiverName: receiverName, // <-- SALVO AQUI
+                receiverDoc: receiverDoc     // <-- SALVO AQUI
+            };
+            deliveries.push(newDelivery);
+            
+            // 3. Salvar tudo
+            saveStockItems();
+            saveDeliveries();
+            
+            // 4. Resetar
+            showMessage(`Entrega #${deliveryId} registrada com sucesso! Recebido por: ${receiverName}`, 'success');
+            currentDeliveryItems = [];
+            deliveryForm.reset();
+            
+            // (Também reseta os campos de assinatura)
+            receiverNameInput.value = '';
+            receiverDocInput.value = '';
+            
+            renderCurrentDeliveryItems();
+            
+            // Recarregar dados para atualizar selects e tabela
+            loadAllData();
+        }
+
+        // --- Inicialização ---
+        
+        function loadAllData() {
+            loadClients();
+            loadStockItems();
+            loadDeliveries();
+            
+            getAggregatedStock(); // Processa o estoque
+            
+            populateClientSelect();
+            populateProductSelect();
+            
+            renderCurrentDeliveryItems(); // Limpa a lista de itens
+            renderDeliveriesTable();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllData();
+
+            // Listeners
+            addItemButton.addEventListener('click', handleAddItem);
+            deliveryForm.addEventListener('submit', handleConfirmDelivery);
+
+            // Lógica do Sidebar (Responsividade)
+            const sidebar = document.getElementById('sidebar');
+            const openBtn = document.getElementById('open-sidebar');
+            const closeBtn = document.getElementById('close-sidebar');
+            const mainWrapper = document.getElementById('main-wrapper');
+
+            if (sidebar && openBtn && closeBtn && mainWrapper) {
+                mainWrapper.addEventListener('click', (e) => {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('translate-x-0')) {
+                        if (!openBtn.contains(e.target) && !sidebar.contains(e.target)) {
+                            sidebar.classList.remove('translate-x-0');
+                            sidebar.classList.add('-translate-x-full');
+                        }
+                    }
+                });
+                openBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.remove('-translate-x-full'); sidebar.classList.add('translate-x-0'); });
+                closeBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.remove('translate-x-0'); sidebar.classList.add('-translate-x-full'); });
+            }
+        });
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentPage = window.location.pathname.split('/').pop();
+            const pageName = currentPage.split('.')[0]; 
+            const activeLink = document.querySelector(`nav a[data-page="${pageName}"]`);
+            if (activeLink) {
+                activeLink.classList.remove('text-gray-300', 'hover:bg-white/10', 'hover:text-white');
+                activeLink.classList.add('bg-[#3B82F6]', 'text-white', 'shadow-lg', 'shadow-blue-500/30');
+            }
+        });
+    </script>
+</body>
+</html>

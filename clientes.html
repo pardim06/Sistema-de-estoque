@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Sistema de Estoque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700&display=swap" rel="stylesheet">
+   
+   <style>
+        body { font-family: 'Inter', sans-serif; color: #E2E8F0; }
+        h1, h2, h3, h4, h5, h6, .font-poppins { font-family: 'Poppins', sans-serif; font-weight: 700; }
+        .sidebar { transition: transform 0.3s ease-in-out; min-height: 100vh; }
+        .main-wrapper { background-color: #0A1628; min-height: 100vh; }
+        #client-modal, #confirm-modal { z-index: 50; color: #1f2937; }
+        html { scroll-behavior: smooth; }
+        .card-glossy {
+            background-color: rgba(28, 44, 68, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        #client-modal input, #confirm-modal input { color: #1f2937; }
+        #client-modal label, #confirm-modal label { color: #374151; }
+   </style>
+</head>
+<body class="flex bg-[#0A1628]">
+
+    <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 bg-[#0A1628] text-white w-64 p-4 z-30 border-r border-white/10">
+        <div class="flex items-center justify-between mb-8">
+            <div class="text-2xl font-poppins flex items-center">
+                <i class="fas fa-boxes-stacked mr-2 text-[#3B82F6]"></i>
+                Estoque 
+            </div>
+            <button id="close-sidebar" class="md:hidden text-gray-400 hover:text-white focus:outline-none">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <nav class="space-y-2">
+            <a href="dashboard.html" data-page="dashboard" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fas fa-chart-line mr-3"></i>
+                Dashboard
+            </a>
+            <a href="cadastro.html" data-page="cadastro" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fas fa-plus-circle mr-3"></i>
+                Cadastro de Item
+            </a>
+            <a href="producao.html" data-page="producao" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fas fa-pallet mr-3"></i>
+                Produção 
+            </a>
+            <a href="clientes.html" data-page="clientes" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fas fa-users mr-3"></i>
+                Clientes
+            </a>
+            <a href="entregas.html" data-page="entregas" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+                <i class="fas fa-truck mr-3"></i>
+                Entregas
+            </a>
+        </nav>
+        <div class="absolute bottom-4 w-full pr-8">
+            <a href="index.html" class="flex items-center p-3 rounded-lg bg-red-600/80 hover:bg-red-600 text-white font-medium justify-center transition-colors">
+                <i class="fas fa-sign-out-alt mr-2"></i>
+                Sair
+            </a>
+        </div>
+    </aside>
+
+    <div id="main-wrapper" class="flex-1 transition-all duration-300 main-wrapper">
+        
+        <header id="header-container" class="bg-gray-900/50 backdrop-blur-lg border-b border-white/10 p-4 flex justify-between items-center sticky top-0 z-20">
+            <button id="open-sidebar" class="md:hidden text-[#3B82F6] focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h1 class="text-xl font-poppins text-white ml-4 md:ml-0">Consulta de Clientes</h1>
+            <div class="flex items-center space-x-4">
+                <p class="text-sm text-gray-300 hidden sm:block">Olá, <span class="font-medium text-white" id="user-name-display">test@t</span></p>
+                <div class="h-10 w-10 bg-[#3B82F6] rounded-full flex items-center justify-center text-white font-bold ring-2 ring-white/20">T</div>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <div id="status-message-container" class="mb-4 hidden" role="alert">
+                <div id="status-message" class="p-4 rounded-lg shadow-lg flex items-center justify-between">
+                    <p class="text-sm font-medium"></p>
+                    <button onclick="document.getElementById('status-message-container').classList.add('hidden')" class="text-white opacity-75 hover:opacity-100 focus:outline-none">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <section id="lista-clientes" class="card-glossy p-8 rounded-2xl shadow-lg">
+                
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+                    <h2 class="text-2xl font-poppins text-white">Clientes Cadastrados</h2>
+                    <div class="w-full sm:w-auto mt-4 sm:mt-0">
+                        <input type="text" id="search-input" placeholder="Buscar cliente..." class="w-full px-4 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-white/10">
+                        <thead class="bg-white/5">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nome</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Telefone</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Endereço</th>
+                                <th scope="col" class="relative px-6 py-3">
+                                    <span class="sr-only">Ações</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="clients-table-body" class="divide-y divide-white/10">
+                            </tbody>
+                    </table>
+                    <p id="no-clients-message" class="text-center text-gray-400 py-8 hidden">Nenhum cliente cadastrado.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="client-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-80 transition-opacity" aria-hidden="true" id="client-modal-overlay"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
+                <i class="fas fa-pencil-alt text-indigo-600"></i>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 font-poppins" id="modal-title">Editar Cliente</h3>
+                <div class="mt-4 space-y-4">
+                    <input type="hidden" id="edit-client-id">
+                    <div>
+                        <label for="edit-client-name" class="block text-sm font-medium text-gray-700">Nome</label>
+                        <input type="text" id="edit-client-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="edit-client-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="edit-client-email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="edit-client-phone" class="block text-sm font-medium text-gray-700">Telefone</label>
+                        <input type="tel" id="edit-client-phone" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                     <div>
+                        <label for="edit-client-address" class="block text-sm font-medium text-gray-700">Endereço</label>
+                        <input type="text" id="edit-client-address" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button type="button" id="save-edit-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+              Salvar
+            </button>
+            <button type="button" id="close-modal-button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="confirm-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-80 transition-opacity" aria-hidden="true" id="confirm-modal-overlay"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:max-w-sm">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <i class="fas fa-trash text-red-600"></i>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 font-poppins" id="confirm-title">Confirmar Exclusão</h3>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500" id="confirm-text">Tem certeza que deseja excluir o cliente <span class="font-bold" id="client-name-to-delete"></span>? Esta ação é irreversível.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button type="button" id="confirm-delete-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+              Excluir
+            </button>
+            <button type="button" id="cancel-delete-button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+      
+    <script>
+        let clients = [];
+        let currentClientId = null;
+
+        const clientModal = document.getElementById('client-modal');
+        const confirmModal = document.getElementById('confirm-modal');
+        const tableBody = document.getElementById('clients-table-body');
+        const noClientsMessage = document.getElementById('no-clients-message');
+        const searchInput = document.getElementById('search-input');
+
+        // --- Funções de Mensagem de Status ---
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('status-message-container');
+            const msgElement = document.getElementById('status-message');
+            const textElement = msgElement.querySelector('p');
+            
+            msgElement.className = 'p-4 rounded-lg shadow-lg flex items-center justify-between';
+            let bgColor, textColor;
+            switch (type) {
+                case 'success': bgColor = 'bg-[#10B981]'; textColor = 'text-white'; break;
+                case 'error': bgColor = 'bg-red-600'; textColor = 'text-white'; break;
+                default: bgColor = 'bg-[#3B82F6]'; textColor = 'text-white'; break;
+            }
+
+            msgElement.classList.add(bgColor, textColor);
+            textElement.textContent = message;
+            container.classList.remove('hidden');
+
+             setTimeout(() => {
+                 if (container) container.classList.add('hidden');
+             }, 5000);
+        }
+
+        // --- Funções de Dados (Local Storage) ---
+        function loadClients() {
+            try {
+                const storedClients = localStorage.getItem('clientes');
+                clients = storedClients ? JSON.parse(storedClients) : [];
+            } catch (e) {
+                console.error("Erro ao carregar 'clientes':", e);
+                clients = [];
+            }
+        }
+
+        function saveClients() {
+            localStorage.setItem('clientes', JSON.stringify(clients));
+        }
+        
+        function refreshTable() {
+            loadClients();
+            const searchTerm = searchInput.value.toLowerCase();
+            let clientsToRender = clients;
+            
+            if (searchTerm) {
+                 clientsToRender = clients.filter(client => 
+                    (client.name && client.name.toLowerCase().includes(searchTerm)) ||
+                    (client.email && client.email.toLowerCase().includes(searchTerm)) ||
+                    (client.phone && client.phone.toLowerCase().includes(searchTerm)) ||
+                    (client.address && client.address.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            renderClientTable(clientsToRender);
+        }
+
+        // --- Renderização ---
+        function renderClientTable(clientList) {
+            tableBody.innerHTML = '';
+
+            if (clientList.length === 0) {
+                noClientsMessage.classList.remove('hidden');
+            } else {
+                noClientsMessage.classList.add('hidden');
+            }
+            
+            // Ordena a lista que foi passada
+            clientList.sort((a, b) => a.name.localeCompare(b.name));
+
+            clientList.forEach(client => {
+                const row = `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${client.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${client.email || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${client.phone || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${client.address || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            <button onclick="openEditModal(${client.id})" class="text-[#3B82F6] hover:text-blue-400" title="Editar">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button onclick="openConfirmModal(${client.id})" class="text-red-500 hover:text-red-400" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // --- Lógica dos Modais (Editar/Excluir) ---
+        function openEditModal(clientId) {
+            // Recarrega os clientes para garantir que estamos editando o dado mais recente
+            loadClients();
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+            
+            currentClientId = clientId;
+            document.getElementById('edit-client-id').value = client.id;
+            document.getElementById('edit-client-name').value = client.name;
+            document.getElementById('edit-client-email').value = client.email;
+            document.getElementById('edit-client-phone').value = client.phone;
+            document.getElementById('edit-client-address').value = client.address;
+            
+            clientModal.classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            clientModal.classList.add('hidden');
+            currentClientId = null;
+        }
+
+        function openConfirmModal(clientId) {
+            loadClients();
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+            
+            currentClientId = clientId;
+            document.getElementById('client-name-to-delete').textContent = client.name;
+            confirmModal.classList.remove('hidden');
+        }
+        
+        function closeConfirmModal() {
+            confirmModal.classList.add('hidden');
+            currentClientId = null;
+        }
+
+        function saveClientEdit() {
+            if (!currentClientId) return;
+            
+            loadClients(); // Garante que estamos com a lista atual
+            const index = clients.findIndex(c => c.id === currentClientId);
+            if (index === -1) {
+                showMessage('Erro: Cliente não encontrado.', 'error');
+                return;
+            }
+
+            const newName = document.getElementById('edit-client-name').value.trim();
+            if (!newName) {
+                showMessage('O nome é obrigatório.', 'error');
+                return;
+            }
+
+            clients[index].name = newName;
+            clients[index].email = document.getElementById('edit-client-email').value;
+            clients[index].phone = document.getElementById('edit-client-phone').value;
+            clients[index].address = document.getElementById('edit-client-address').value;
+
+            saveClients();
+            refreshTable(); // Atualiza a tabela
+            closeEditModal();
+            showMessage('Cliente atualizado com sucesso!', 'success');
+        }
+        
+        function deleteClient() {
+            if (!currentClientId) return;
+            
+            loadClients();
+            clients = clients.filter(c => c.id !== currentClientId);
+            saveClients();
+            refreshTable(); // Atualiza a tabela
+            closeConfirmModal();
+            showMessage('Cliente excluído com sucesso.', 'success');
+        }
+
+        // --- Inicialização ---
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshTable(); // Carga inicial
+
+            // Listener da Pesquisa
+            searchInput.addEventListener('input', refreshTable);
+
+            // Listeners dos Modais
+            document.getElementById('save-edit-button').addEventListener('click', saveClientEdit);
+            document.getElementById('close-modal-button').addEventListener('click', closeEditModal);
+            document.getElementById('client-modal-overlay').addEventListener('click', closeEditModal);
+            
+            document.getElementById('confirm-delete-button').addEventListener('click', deleteClient);
+            document.getElementById('cancel-delete-button').addEventListener('click', closeConfirmModal);
+            document.getElementById('confirm-modal-overlay').addEventListener('click', closeConfirmModal);
+
+            // Lógica do Sidebar (Responsividade)
+            const sidebar = document.getElementById('sidebar');
+            const openBtn = document.getElementById('open-sidebar');
+            const closeBtn = document.getElementById('close-sidebar');
+            const mainWrapper = document.getElementById('main-wrapper');
+
+            if (sidebar && openBtn && closeBtn && mainWrapper) {
+                mainWrapper.addEventListener('click', (e) => {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('translate-x-0')) {
+                        if (!openBtn.contains(e.target) && !sidebar.contains(e.target)) {
+                            sidebar.classList.remove('translate-x-0');
+                            sidebar.classList.add('-translate-x-full');
+                        }
+                    }
+                });
+                openBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.remove('-translate-x-full'); sidebar.classList.add('translate-x-0'); });
+                closeBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.remove('translate-x-0'); sidebar.classList.add('-translate-x-full'); });
+            }
+        });
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentPage = window.location.pathname.split('/').pop();
+            const pageName = currentPage.split('.')[0]; 
+            const activeLink = document.querySelector(`nav a[data-page="${pageName}"]`);
+            if (activeLink) {
+                activeLink.classList.remove('text-gray-300', 'hover:bg-white/10', 'hover:text-white');
+                activeLink.classList.add('bg-[#3B82F6]', 'text-white', 'shadow-lg', 'shadow-blue-500/30');
+            }
+        });
+    </script>
+</body>
+</html>
