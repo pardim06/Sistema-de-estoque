@@ -4,82 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Premium - Sistema de Estoque</title>
-    <!-- Tailwind CSS -->
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome (Ícones) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <!-- Fontes do Google (Inter e Poppins) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700&display=swap" rel="stylesheet">
-   
+    
    <style>
-        /* Estilos Base e Tipografia */
+        /* --- ESTILOS GERAIS --- */
         body {
             font-family: 'Inter', sans-serif;
-            color: #E2E8F0; /* Cinza Claro (Texto padrão) */
+            color: #E2E8F0; /* Texto cinza-claro */
         }
         
-        /* Aplicando Poppins Bold aos títulos */
+        /* Títulos com a fonte Poppins */
         h1, h2, h3, h4, h5, h6, .font-poppins {
             font-family: 'Poppins', sans-serif;
             font-weight: 700;
         }
 
+        /* Animação da sidebar */
         .sidebar {
             transition: transform 0.3s ease-in-out;
             min-height: 100vh;
         }
         
-        /* Fundo principal com a cor Deep Navy */
+        /* Cor de fundo principal */
         .main-wrapper { 
             background-color: #0A1628; /* Deep Navy */
             min-height: 100vh;
         }
         
-        /* Estilo para garantir que o modal fique acima de tudo */
+        /* --- ESTILOS DOS MODAIS (Pop-ups) --- */
         #item-modal, #confirm-modal, #details-modal {
             z-index: 50; 
-            /* Modais manterão o tema claro para legibilidade */
-            color: #1f2937; /* Resetando a cor do texto para escuro nos modais */
+            color: #1f2937; /* Modais em tema claro para legibilidade */
         }
         
         html {
             scroll-behavior: smooth;
         }
         
-        /* --- ESTILO PREMIUM DO DASHBOARD --- */
-
-        /* Efeito de Card Brilhante (Glassmorphism/Glossy) */
+        /* --- TEMA PREMIUM (Glassmorphism) --- */
         .card-glossy {
-            /* Fundo escuro semitransparente com filtro de desfoque */
-            background-color: rgba(28, 44, 68, 0.5); /* Um azul-acinzentado escuro */
+            background-color: rgba(28, 44, 68, 0.5); /* Fundo semi-transparente */
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            
-            /* Borda sutil para definir o card */
-            border: 1px solid rgba(226, 232, 240, 0.1); /* Cinza Claro (E2E8F0) com 10% opacidade */
-            
-            /* Sombra suave para profundidade */
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(226, 232, 240, 0.1); /* Borda sutil */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Sombra */
         }
 
-        /* Estilo para a tabela de detalhes no modal (mantido) */
+        /* --- ESTILOS ESPECÍFICOS --- */
+        
+        /* Tabela de detalhes dentro do modal */
         #details-entries-table th, #details-entries-table td {
             padding: 0.5rem 0.75rem;
-            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+            border-bottom: 1px solid #e5e7eb;
         }
         #details-entries-table th {
-            background-color: #f9fafb; /* gray-50 */
+            background-color: #f9fafb;
             text-align: left;
             font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #4b5563; /* gray-600 */
+            color: #4b5563;
         }
 
-        /* Corrigindo a cor dos inputs de modal */
+        /* Cor do texto dentro dos inputs dos modais */
         #item-modal input, #confirm-modal input, #details-modal input {
             color: #1f2937;
         }
@@ -88,11 +80,11 @@
         }
    </style>
 </head>
-<body class="flex bg-deep-navy"> <!-- Fundo do body também -->
 
-    <!-- Sidebar (Navegação Lateral) -->
-    <!-- Cores atualizadas: bg-deep-navy, textos em cinza/branco, highlight em Azul Vibrante -->
-    <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 bg-[#0A1628] text-white w-64 p-4 z-30 border-r border-white/10">
+<body class="bg-deep-navy"> 
+
+    <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 bg-[#0A1628] text-white w-64 p-4 z-30 border-r border-white/10">
+        
         <div class="flex items-center justify-between mb-8">
             <div class="text-2xl font-poppins flex items-center">
                 <i class="fas fa-boxes-stacked mr-2 text-[#3B82F6]"></i>
@@ -104,30 +96,28 @@
         </div>
 
         <nav class="space-y-2">
-            <!-- Link Ativo (Dashboard) -->
-            <a href="#visao-geral" class="flex items-center p-3 rounded-lg bg-[#3B82F6] text-white font-medium shadow-lg shadow-blue-500/30">
+            <a href="dashboard.html" data-page="dashboard" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
                 <i class="fas fa-chart-line mr-3"></i>
                 Dashboard
             </a>
-            <!-- Outros Links -->
-            <a href="cadastro.html" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+            <a href="cadastro.html" data-page="cadastro" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
                 <i class="fas fa-plus-circle mr-3"></i>
                 Cadastro de Item
             </a>
-            <a href="Producao.html" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
+            <a href="producao.html" data-page="producao" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
                 <i class="fas fa-pallet mr-3"></i>
                 Produção 
             </a>
-            <a href="#" class="flex items-center p-3 rounded-lg text-gray-500 font-medium cursor-not-allowed opacity-60">
+            <a href="clientes.html" data-page="clientes" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
                 <i class="fas fa-users mr-3"></i>
                 Clientes
             </a>
-            <a href="#" class="flex items-center p-3 rounded-lg text-gray-500 font-medium cursor-not-allowed opacity-60">
+            <a href="entregas.html" data-page="entregas" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white font-medium">
                 <i class="fas fa-truck mr-3"></i>
                 Entregas
             </a>
         </nav>
-
+        
         <div class="absolute bottom-4 w-full pr-8">
             <a href="index.html" class="flex items-center p-3 rounded-lg bg-red-600/80 hover:bg-red-600 text-white font-medium justify-center transition-colors">
                 <i class="fas fa-sign-out-alt mr-2"></i>
@@ -136,11 +126,8 @@
         </div>
     </aside>
 
-    <!-- Conteúdo Principal -->
-    <div id="main-wrapper" class="flex-1 transition-all duration-300 main-wrapper">
+    <div id="main-wrapper" class="md:pl-64 transition-all duration-300 main-wrapper">
         
-        <!-- Header (Topo) -->
-        <!-- Efeito de vidro (backdrop-blur) e fundo semitransparente -->
         <header id="header-container" class="bg-gray-900/50 backdrop-blur-lg border-b border-white/10 p-4 flex justify-between items-center sticky top-0 z-20">
             <button id="open-sidebar" class="md:hidden text-[#3B82F6] focus:outline-none">
                 <i class="fas fa-bars text-xl"></i>
@@ -154,7 +141,6 @@
 
         <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
-            <!-- Alerta de Status (Cores ajustadas) -->
             <div id="status-message-container" class="mb-4 hidden" role="alert">
                 <div id="status-message" class="p-4 rounded-lg shadow-lg flex items-center justify-between">
                     <p class="text-sm font-medium"></p>
@@ -167,9 +153,7 @@
             <section id="visao-geral">
                 <h1 class="text-3xl font-poppins text-white mb-6 hidden md:block">Visão Geral do Estoque</h1>
 
-                <!-- Cards de Métricas (Efeito Glossy) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <!-- Card 1: Total -->
                     <div id="card-total" class="card-glossy p-6 rounded-2xl flex items-center justify-between cursor-pointer hover:border-white/20 transition-all duration-300">
                         <div>
                             <p class="text-sm font-medium text-[#E2E8F0]">Total de Itens</p>
@@ -179,7 +163,6 @@
                             <i class="fas fa-boxes-stacked fa-lg text-[#3B82F6]"></i>
                         </div>
                     </div>
-                    <!-- Card 2: Matérias-Primas -->
                     <div id="card-raw" class="card-glossy p-6 rounded-2xl flex items-center justify-between cursor-pointer hover:border-white/20 transition-all duration-300">
                         <div>
                             <p class="text-sm font-medium text-[#E2E8F0]">Matérias-Primas</p>
@@ -189,7 +172,6 @@
                             <i class="fas fa-cogs fa-lg text-cyan-400"></i>
                         </div>
                     </div>
-                    <!-- Card 3: Produtos Acabados -->
                     <div id="card-finished" class="card-glossy p-6 rounded-2xl flex items-center justify-between cursor-pointer hover:border-white/20 transition-all duration-300">
                         <div>
                             <p class="text-sm font-medium text-[#E2E8F0]">Produtos Acabados</p>
@@ -199,7 +181,6 @@
                             <i class="fas fa-box-open fa-lg text-[#10B981]"></i>
                         </div>
                     </div>
-                    <!-- Card 4: Baixo Estoque -->
                     <div id="card-low-stock" class="card-glossy p-6 rounded-2xl flex items-center justify-between cursor-pointer hover:border-white/20 transition-all duration-300">
                         <div>
                             <p class="text-sm font-medium text-[#E2E8F0]">Baixo Estoque</p>
@@ -211,18 +192,15 @@
                     </div>
                 </div>
 
-                <!-- Tabela de Itens (Efeito Glossy) -->
                 <div class="card-glossy p-6 sm:p-8 rounded-2xl mb-12">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
                         <h2 class="text-2xl font-poppins text-white">Itens em Estoque</h2>
                         <div class="w-full sm:w-auto mt-4 sm:mt-0">
-                            <!-- Input de Busca (Estilo Dark) -->
                             <input type="text" id="search-input" placeholder="Buscar item..." class="w-full px-4 py-2 border border-white/20 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] bg-black/20 text-white placeholder-gray-400">
                         </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-white/10">
-                            <!-- Cabeçalho da Tabela (Estilo Dark) -->
                             <thead class="bg-white/5">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nome</th>
@@ -236,10 +214,8 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <!-- Corpo da Tabela (Estilo Dark) -->
                             <tbody id="stock-table-body" class="divide-y divide-white/10">
-                                <!-- Linhas serão inseridas pelo JS -->
-                            </tbody>
+                                </tbody>
                         </table>
                         <p id="no-items-message" class="text-center text-gray-400 py-8 hidden">Nenhum item encontrado no estoque local.</p>
                     </div>
@@ -248,9 +224,6 @@
         </main>
     </div>
 
-    <!-- === MODAIS (Mantidos em Tema Claro para Legibilidade) === -->
-
-    <!-- Modal de Edição -->
     <div id="item-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-gray-900 bg-opacity-80 transition-opacity" aria-hidden="true"></div>
@@ -296,7 +269,6 @@
       </div>
     </div>
     
-    <!-- Modal de Confirmação -->
     <div id="confirm-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-gray-900 bg-opacity-80 transition-opacity" aria-hidden="true"></div>
@@ -327,7 +299,6 @@
       </div>
     </div>
 
-    <!-- Modal de Detalhes -->
     <div id="details-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="details-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <div id="details-modal-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-80 transition-opacity" aria-hidden="true"></div>
@@ -348,20 +319,19 @@
                       <span id="details-total-quantity" class="font-bold text-lg text-gray-800">0</span>
                     </p>
                     
-                    <h4 class="text-md font-semibold text-gray-700 mb-2 font-poppins">Histórico de Entradas</h4>
+                    <h4 class="text-md font-semibold text-gray-700 mb-2 font-poppins">Histórico de Entradas/Saídas</h4>
                     <div class="max-h-64 overflow-y-auto border rounded-lg">
                       <table id="details-entries-table" class="min-w-full">
                         <thead>
                           <tr>
-                            <th>Data de Entrada</th>
+                            <th>Data</th>
                             <th>Quantidade</th>
-                            <th>Fornecedor</th>
+                            <th>Origem/Destino (Fornecedor)</th>
                             <th>Data de Registro (Sistema)</th>
                           </tr>
                         </thead>
                         <tbody id="details-entries-table-body" class="divide-y divide-gray-200">
-                          <!-- JS insere dados aqui -->
-                        </tbody>
+                          </tbody>
                       </table>
                     </div>
 
@@ -378,30 +348,27 @@
         </div>
       </div>
       
-    <!-- Script (O MESMO SCRIPT DO SEU dashboard.html, MAS COM AJUSTES DE RENDERIZAÇÃO) -->
     <script>
-        // Variável global para armazenar todos os itens (cache local)
+        // Variável global para guardar os itens do localStorage
         let stockItems = [];
 
-        // Variável para armazenar o ID do item em edição/exclusão
+        // Variável global para saber qual item está sendo editado/excluído
         let currentItemId = null;
 
 
-        // --- Funções de Mensagem de Status ---
+        // --- Funções de Mensagem de Status (Toast) ---
         function showMessage(message, type = 'info') {
             const container = document.getElementById('status-message-container');
             const msgElement = document.getElementById('status-message');
             const textElement = msgElement.querySelector('p');
             
-            // Limpa classes antigas de cor
             msgElement.className = 'p-4 rounded-lg shadow-lg flex items-center justify-between';
 
             let bgColor, textColor;
             switch (type) {
-                // Usando as cores vibrantes do design
-                case 'success': bgColor = 'bg-[#10B981]'; textColor = 'text-white'; break; // Verde Esmeralda
+                case 'success': bgColor = 'bg-[#10B981]'; textColor = 'text-white'; break;
                 case 'error': bgColor = 'bg-red-600'; textColor = 'text-white'; break;
-                default: bgColor = 'bg-[#3B82F6]'; textColor = 'text-white'; break; // Azul Vibrante
+                default: bgColor = 'bg-[#3B82F6]'; textColor = 'text-white'; break;
             }
 
             msgElement.classList.add(bgColor, textColor);
@@ -416,7 +383,7 @@
              }, 5000);
         }
 
-        // --- Funções Auxiliares de Dados (Local Storage) ---
+        // --- Funções Auxiliares de Dados e Formatação ---
         
         function getCurrentDateFormatted() {
             const now = new Date();
@@ -426,6 +393,7 @@
             return `${day}/${month}/${year}`;
         }
         
+        // Converte data 'YYYY-MM-DD' para 'DD/MM/YYYY'
         function formatDateToBR(dateString) {
             if (!dateString) return '';
             if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) return dateString;
@@ -437,6 +405,7 @@
             return dateString;
         }
 
+        // Converte data/hora ISO (do sistema) para 'DD/MM/YYYY HH:MM'
         function formatTimestampToBR(isoString) {
             if (!isoString) return 'N/A';
             try {
@@ -454,6 +423,9 @@
             }
         }
 
+        // --- Funções de Leitura/Escrita no LocalStorage ---
+
+        // Carrega todos os itens de 'stock_items' para a variável global 'stockItems'
         function loadItems() {
             stockItems = [];
             const storedItems = localStorage.getItem('stock_items');
@@ -485,6 +457,7 @@
             }
         }
 
+        // Salva o array 'stockItems' de volta no LocalStorage
         function saveItems() {
              try {
                  localStorage.setItem('stock_items', JSON.stringify(stockItems));
@@ -494,18 +467,25 @@
              }
         }
 
-        // --- Lógica de Agregação e Renderização ---
+        // --- Funções de Agregação e Renderização ---
 
-       function getAggregatedStock() {
-            const grouped = new Map();
+        /**
+         * Esta é a função MAIS IMPORTANTE do dashboard.
+         * Ela lê TODAS as transações (entradas +, saídas -) e agrupa pelo nome do item
+         * para descobrir a quantidade ATUAL em estoque.
+         */
+        function getAggregatedStock() {
+            const grouped = new Map(); // Um "mapa" para agrupar os itens
              if (!Array.isArray(stockItems)) { 
                  console.error("stockItems não é um array em getAggregatedStock");
                  return [];
              }
 
+            // Loop por CADA transação no localStorage
             for (const item of stockItems) {
                  if (!item.name || item.name === 'Nome Inválido') continue; 
 
+                // Se for a primeira vez vendo esse item, cria um grupo para ele
                 if (!grouped.has(item.name)) {
                     grouped.set(item.name, { 
                         name: item.name,
@@ -515,16 +495,19 @@
                         entryDate: item.entryDate,
                         supplier: item.supplier,
                         latestCreatedAt: item.createdAt,
-                        lastNonProdSupplier: null
+                        lastNonProdSupplier: null // Para guardar o último fornecedor "real"
                     });
-                     if (item.supplier && !item.supplier.startsWith('Produção OP')) {
+                     // Guarda o fornecedor se não for 'Produção' ou 'Entrega'
+                     if (item.supplier && !item.supplier.startsWith('Produção OP') && !item.supplier.startsWith('Entrega #')) {
                          grouped.get(item.name).lastNonProdSupplier = item.supplier;
                      }
                 }
 
+                // Pega o item do grupo e SOMA a quantidade (pode ser +10 ou -2)
                 const data = grouped.get(item.name);
                 data.quantity += item.quantity; 
                 
+                 // Atualiza os dados do item (tipo, data, etc.) para os da transação MAIS RECENTE
                  if (item.createdAt && (!data.latestCreatedAt || item.createdAt > data.latestCreatedAt)) {
                     data.latestCreatedAt = item.createdAt;
                     data.entryDate = item.entryDate;
@@ -533,19 +516,21 @@
                 }
 
                  data.supplier = item.supplier;
-                 if (item.supplier && !item.supplier.startsWith('Produção OP')) {
+                 if (item.supplier && !item.supplier.startsWith('Produção OP') && !item.supplier.startsWith('Entrega #')) {
                      data.lastNonProdSupplier = item.supplier;
                  }
             }
 
              const aggregatedList = Array.from(grouped.values());
              aggregatedList.forEach(itemData => {
+                 // Define o fornecedor "real" (ignora 'Produção' e 'Entrega' se houver um fornecedor normal)
                  itemData.supplier = itemData.lastNonProdSupplier || itemData.supplier;
              });
 
-            return aggregatedList;
+            return aggregatedList; // Retorna a lista de itens agrupados com o saldo final
         }
 
+        // Atualiza os 4 cards do topo (Total, Matérias-Primas, etc.)
         function updateSummaryCards() {
             let totalItems = 0;
             let rawMaterials = 0;
@@ -555,20 +540,24 @@
             const aggregatedStock = getAggregatedStock(); 
             
             aggregatedStock.forEach(item => {
-                 if (item.quantity !== 0) {
+                 // Só conta para o total se for positivo
+                 if (item.quantity > 0) {
                      totalItems += item.quantity;
 
-                     if (item.quantity <= item.minQuantity) {
-                        lowStockCount++;
-                     }
                      if (item.type === 'materia-prima') {
                         rawMaterials += item.quantity;
                      } else if (item.type === 'produto-acabado') {
                         finishedProducts += item.quantity;
                      }
                  }
+                 
+                 // Conta como 'Baixo Estoque' se a quantidade for menor ou igual à mínima
+                 if (item.quantity <= item.minQuantity) {
+                    lowStockCount++;
+                 }
             });
             
+             // Atualiza os números no HTML
              const elTotal = document.getElementById('total-items');
              const elRaw = document.getElementById('total-raw-materials');
              const elFinished = document.getElementById('total-finished-products');
@@ -580,6 +569,7 @@
              if (elLow) elLow.textContent = lowStockCount.toLocaleString('pt-BR');
         }
 
+        // Desenha as linhas da tabela de estoque
         function updateStockTable(aggregatedItems) {
             const tableBody = document.getElementById('stock-table-body');
             const noItemsMessage = document.getElementById('no-items-message');
@@ -589,35 +579,35 @@
                  return;
              }
              
-            tableBody.innerHTML = '';
+            tableBody.innerHTML = ''; // Limpa a tabela antiga
 
-            const itemsToShow = aggregatedItems.filter(item => item.quantity !== 0);
+            // Filtra itens com estoque 0 ou negativo (não aparecem na tabela principal)
+            const itemsToShow = aggregatedItems.filter(item => item.quantity > 0);
 
             if (itemsToShow.length === 0) {
-                noItemsMessage.classList.remove('hidden');
+                noItemsMessage.classList.remove('hidden'); // Mostra "Nenhum item"
             } else {
-                noItemsMessage.classList.add('hidden');
+                noItemsMessage.classList.add('hidden'); // Esconde "Nenhum item"
             }
             
-            itemsToShow.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            itemsToShow.sort((a, b) => (a.name || '').localeCompare(b.name || '')); // Ordena por nome
 
+            // Cria uma linha (<tr>) para cada item
             itemsToShow.forEach(item => {
                 const isLowStock = item.quantity <= item.minQuantity;
                 
-                // *** ATUALIZAÇÃO DE CORES PARA TEMA DARK ***
-                // Usando Verde Esmeralda (#10B981) e Vermelho
+                // Define a cor do status (vermelho para baixo, verde para ok)
                 const statusColor = isLowStock 
                     ? 'bg-red-500/10 text-red-400' 
-                    : 'bg-emerald-500/10 text-[#10B981]'; // Verde Esmeralda
+                    : 'bg-emerald-500/10 text-[#10B981]';
                 const statusText = isLowStock ? 'Baixo Estoque' : 'Em Estoque';
                 
                 const formattedDate = formatDateToBR(item.entryDate); 
 
+                // HTML da linha
                 const row = `
                     <tr class="hover:bg-white/5 transition-colors">
-                        <!-- Texto da tabela: text-white e text-gray-300 -->
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
-                            <!-- Link de Detalhes: text-blue-400 (Azul Vibrante claro) -->
                             <a href="#" 
                                class="details-btn text-[#3B82F6] hover:text-blue-400 hover:underline" 
                                data-item-name="${item.name}">
@@ -634,14 +624,13 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${formattedDate}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${item.supplier || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <!-- Ação (se houver) -->
-                        </td>
+                            </td>
                     </tr>
                 `;
-                tableBody.insertAdjacentHTML('beforeend', row);
+                tableBody.insertAdjacentHTML('beforeend', row); // Adiciona a linha na tabela
             });
 
-            // Reatribui listeners
+            // Re-adiciona os 'escutadores de clique' nos botões de detalhes
             document.querySelectorAll('.details-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -651,7 +640,10 @@
             });
         }
         
-        // --- Lógica do Modal de Edição (Sem alteração funcional) ---
+        // --- Funções dos Modais ---
+        
+        // Abre o modal de EDIÇÃO de uma transação
+        // (Nota: Isso edita a *transação*, não o item agrupado)
         const editModal = document.getElementById('item-modal');
         const confirmModal = document.getElementById('confirm-modal');
         const editIdInput = document.getElementById('edit-item-id');
@@ -680,6 +672,7 @@
 
         function closeEditModal() { if(editModal) editModal.classList.add('hidden'); }
 
+        // Abre o modal de CONFIRMAÇÃO de exclusão
         function openConfirmModal() {
             const item = stockItems.find(i => i.id === currentItemId);
              if (!item) return;
@@ -691,6 +684,7 @@
         
         function closeConfirmModal() { if (confirmModal) confirmModal.classList.add('hidden'); }
         
+        // Salva as alterações da transação
         function saveItemEdit() {
             const itemId = currentItemId;
              if (!itemId) {
@@ -701,7 +695,7 @@
             const newQuantity = editQuantityInput ? parseInt(editQuantityInput.value) : NaN;
 
             if (isNaN(newQuantity) || !newName) {
-                showMessage('Por favor, insira um nome e quantidade válidos (pode ser negativo).', 'error'); 
+                showMessage('Por favor, insira um nome e quantidade válidos.', 'error'); 
                 return;
             }
 
@@ -710,7 +704,7 @@
                 stockItems[index].name = newName;
                 stockItems[index].quantity = newQuantity;
                 saveItems();
-                renderAllItems(); 
+                renderAllItems(); // Re-desenha tudo
                 closeEditModal();
                 showMessage(`Transação "${newName}" atualizada com sucesso!`, 'success');
             } else {
@@ -718,6 +712,7 @@
             }
         }
         
+        // Exclui a transação
         function deleteItem() {
              if (!currentItemId) {
                  showMessage("Erro: ID do item não encontrado para exclusão.", "error");
@@ -729,15 +724,15 @@
                  closeConfirmModal();
                  return;
              }
-            stockItems = stockItems.filter(i => i.id !== currentItemId);
+            stockItems = stockItems.filter(i => i.id !== currentItemId); // Remove o item do array
             saveItems();
-            renderAllItems(); 
+            renderAllItems(); // Re-desenha tudo
             closeConfirmModal();
             showMessage(`Transação "${itemToDelete.name}" excluída com sucesso.`, 'success');
              currentItemId = null;
         }
 
-        // --- Lógica do Modal de Detalhes (Sem alteração funcional) ---
+        // Abre o modal de DETALHES (Histórico do Item)
         const detailsModal = document.getElementById('details-modal');
         const detailsItemName = document.getElementById('details-item-name');
         const detailsTotalQuantity = document.getElementById('details-total-quantity');
@@ -746,22 +741,25 @@
         const detailsModalOverlay = document.getElementById('details-modal-overlay');
 
         function openDetailsModal(itemName) {
-            loadItems(); 
+            loadItems(); // Garante que temos os dados mais recentes
             
+            // Filtra TODAS as transações (entradas e saídas) para este item
             const entries = stockItems.filter(item => item.name === itemName);
             
+            // Calcula o total somando tudo (ex: 10 + 5 - 2 = 13)
             const totalQuantity = entries.reduce((sum, item) => sum + item.quantity, 0);
 
              if (detailsItemName) detailsItemName.textContent = itemName;
              if (detailsTotalQuantity) detailsTotalQuantity.textContent = totalQuantity.toLocaleString('pt-BR');
             
              if (detailsTableBody) {
-                detailsTableBody.innerHTML = '';
-                entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                detailsTableBody.innerHTML = ''; // Limpa a tabela
+                entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Ordena por mais recente
 
+                // Cria as linhas do histórico
                 entries.forEach(entry => {
                     const isEntry = entry.quantity > 0;
-                    const qtyClass = isEntry ? 'text-green-600' : 'text-red-600';
+                    const qtyClass = isEntry ? 'text-green-600' : 'text-red-600'; // Verde para entrada, vermelho para saída
                     const qtyPrefix = isEntry ? '+' : '';
 
                     const row = `
@@ -780,18 +778,19 @@
                     detailsTableBody.insertAdjacentHTML('beforeend', row);
                 });
 
+                // Adiciona 'escutadores de clique' nos botões de edição dentro do modal
                 detailsTableBody.querySelectorAll('.edit-btn-modal').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const itemId = parseInt(e.currentTarget.dataset.itemId);
                          if (!isNaN(itemId)) {
                             closeDetailsModal(); 
-                            openEditModal(itemId); 
+                            openEditModal(itemId); // Fecha o modal de detalhes e abre o de edição
                          }
                     });
                 });
              }
             
-             if (detailsModal) detailsModal.classList.remove('hidden');
+             if (detailsModal) detailsModal.classList.remove('hidden'); // Mostra o modal de detalhes
         }
 
         function closeDetailsModal() {
@@ -807,42 +806,53 @@
                 const aggregatedList = getAggregatedStock(); 
 
                 if (searchTerm === '') {
-                    updateStockTable(aggregatedList);
+                    // Se a busca está vazia, mostra todos os itens com estoque > 0
+                    updateStockTable(aggregatedList.filter(item => item.quantity > 0));
                     return;
                 }
                 
+                // Filtra a lista
                 const filteredItems = aggregatedList.filter(item => 
-                     (item.name && item.name.toLowerCase().includes(searchTerm)) ||
-                     (item.supplier && item.supplier.toLowerCase().includes(searchTerm)) ||
-                     (item.type && item.type.toLowerCase().includes(searchTerm))
+                     (item.quantity > 0) && // Só busca em itens que temos no estoque
+                     (
+                         (item.name && item.name.toLowerCase().includes(searchTerm)) ||
+                         (item.supplier && item.supplier.toLowerCase().includes(searchTerm)) ||
+                         (item.type && item.type.toLowerCase().includes(searchTerm))
+                     )
                 );
                 
-                updateStockTable(filteredItems);
+                updateStockTable(filteredItems); // Re-desenha a tabela com os itens filtrados
             });
          }
 
 
-        // --- Renderização Principal ---
+        // --- Função de Renderização Principal ---
+        // É chamada quando a página carrega
         function renderAllItems() {
-            loadItems(); 
-            const aggregatedList = getAggregatedStock(); 
-            updateSummaryCards(); 
-            updateStockTable(aggregatedList); 
+            loadItems(); // 1. Carrega dados do localStorage
+            const aggregatedList = getAggregatedStock(); // 2. Calcula o saldo atual
+            updateSummaryCards(); // 3. Atualiza os 4 cards do topo
+            // 4. Desenha a tabela principal (apenas com itens de estoque > 0)
+            updateStockTable(aggregatedList.filter(item => item.quantity > 0)); 
         }
 
         // --- Inicialização e Listeners ---
+        // Roda quando o HTML termina de carregar
         document.addEventListener('DOMContentLoaded', () => {
-            renderAllItems();
+            renderAllItems(); // Desenha a tela inicial
 
+            // Verifica se viemos da página de cadastro (para mostrar msg de sucesso)
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('status') && urlParams.get('status') === 'success') {
                 showMessage('Item cadastrado com sucesso!', 'success');
                  try {
-                    history.replaceState(null, '', window.location.pathname);
+                    // Limpa a URL para não mostrar a msg de novo se der F5
+                    history.replaceState(null, '', window.location.pathname); 
                  } catch(e) { console.warn("history.replaceState não suportado?"); }
             }
             
-            // Listeners dos Modais
+            // --- Listeners dos Modais ---
+            // (Conecta os botões "Salvar", "Excluir", "Cancelar" às suas funções JS)
              if (saveEditButton) saveEditButton.addEventListener('click', saveItemEdit);
              if (closeModalButton) closeModalButton.addEventListener('click', closeEditModal);
              if (openDeleteConfirmButton) openDeleteConfirmButton.addEventListener('click', openConfirmModal);
@@ -851,34 +861,40 @@
              if (closeDetailsModalButton) closeDetailsModalButton.addEventListener('click', closeDetailsModal);
              if (detailsModalOverlay) detailsModalOverlay.addEventListener('click', closeDetailsModal);
              
-             const editModalBg = editModal ? editModal.querySelector('.bg-opacity-80') : null; // Atualizado para bg-opacity-80
-             const confirmModalBg = confirmModal ? confirmModal.querySelector('.bg-opacity-80') : null; // Atualizado para bg-opacity-80
+             const editModalBg = editModal ? editModal.querySelector('.bg-opacity-80') : null;
+             const confirmModalBg = confirmModal ? confirmModal.querySelector('.bg-opacity-80') : null;
              if (editModalBg) editModalBg.addEventListener('click', closeEditModal);
              if (confirmModalBg) confirmModalBg.addEventListener('click', closeConfirmModal);
 
 
-            // Listeners dos Cards de Filtro
+            // --- Listeners dos Cards de Filtro ---
+            // (Faz os 4 cards do topo funcionarem como filtros da tabela)
              const cardTotal = document.getElementById('card-total');
              const cardRaw = document.getElementById('card-raw');
              const cardFinished = document.getElementById('card-finished');
              const cardLowStock = document.getElementById('card-low-stock');
 
+             // Clicar em "Total" limpa a busca
              if (cardTotal && searchInput) cardTotal.addEventListener('click', () => { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); });
+             // Clicar em "Matérias-Primas" filtra por "materia-prima"
              if (cardRaw && searchInput) cardRaw.addEventListener('click', () => { searchInput.value = 'materia-prima'; searchInput.dispatchEvent(new Event('input')); });
+             // Clicar em "Produtos Acabados" filtra por "produto-acabado"
              if (cardFinished && searchInput) cardFinished.addEventListener('click', () => { searchInput.value = 'produto-acabado'; searchInput.dispatchEvent(new Event('input')); });
+             // Clicar em "Baixo Estoque" filtra itens com estoque <= mínimo
              if (cardLowStock && searchInput) cardLowStock.addEventListener('click', () => { 
                  searchInput.value = ''; 
-                 const lowStockItems = getAggregatedStock().filter(item => item.quantity <= item.minQuantity);
+                 const lowStockItems = getAggregatedStock().filter(item => item.quantity > 0 && item.quantity <= item.minQuantity);
                  updateStockTable(lowStockItems);
              });
             
-            // Lógica do Sidebar (Responsividade)
+            // --- Lógica da Sidebar Responsiva ---
             const sidebar = document.getElementById('sidebar');
             const openBtn = document.getElementById('open-sidebar');
             const closeBtn = document.getElementById('close-sidebar');
              const mainWrapper = document.getElementById('main-wrapper');
 
              if (sidebar && openBtn && closeBtn && mainWrapper) {
+                // Fecha o menu se clicar fora dele (no celular)
                 mainWrapper.addEventListener('click', (e) => {
                     if (window.innerWidth < 768 && sidebar.classList.contains('translate-x-0')) {
                         if (!openBtn.contains(e.target) && !sidebar.contains(e.target)) {
@@ -887,15 +903,41 @@
                         }
                     }
                 });
+                // Abre o menu ao clicar no "hamburger"
                 openBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.remove('-translate-x-full'); sidebar.classList.add('translate-x-0'); });
+                // Fecha o menu ao clicar no "X"
                 closeBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.remove('translate-x-0'); sidebar.classList.add('-translate-x-full'); });
-                
-                document.querySelectorAll('#sidebar a[href^="#"]').forEach(anchor => {
-                    anchor.addEventListener('click', () => {
-                        if (window.innerWidth < 768) { sidebar.classList.remove('translate-x-0'); sidebar.classList.add('-translate-x-full'); }
-                    });
-                });
              }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Pega o nome do arquivo atual (ex: "dashboard.html")
+            const currentPage = window.location.pathname.split('/').pop();
+            
+            // Extrai o nome base (ex: "dashboard")
+            const pageName = currentPage.split('.')[0] || 'dashboard'; // Usa 'dashboard' como padrão
+
+            // Procura o link que tem o 'data-page' correspondente
+            const activeLink = document.querySelector(`nav a[data-page="${pageName}"]`);
+            
+            if (activeLink) {
+                // Remove as classes de link "inativo"
+                activeLink.classList.remove('text-gray-300', 'hover:bg-white/10', 'hover:text-white');
+                
+                // Adiciona as classes de link "ativo" (fundo azul)
+                activeLink.classList.add('bg-[#3B82F6]', 'text-white', 'shadow-lg', 'shadow-blue-500/30');
+            } else {
+                 // Se não achar um link (ex: página de erro), destaca o dashboard por padrão
+                 if (pageName !== 'index'){
+                     const dashboardLink = document.querySelector(`nav a[data-page="dashboard"]`);
+                     if (dashboardLink) {
+                         dashboardLink.classList.remove('text-gray-300', 'hover:bg-white/10', 'hover:text-white');
+                         dashboardLink.classList.add('bg-[#3B82F6]', 'text-white', 'shadow-lg', 'shadow-blue-500/30');
+                     }
+                 }
+            }
         });
     </script>
 </body>
